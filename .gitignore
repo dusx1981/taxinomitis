@@ -1,4 +1,4 @@
-.vscode
+# .vscode
 .DS_Store
 manifest-dev.yml
 manifest-prod-ussouth.yml

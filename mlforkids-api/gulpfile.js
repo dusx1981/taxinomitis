@@ -12,6 +12,9 @@ const jsonminify = require('gulp-jsonminify');
 const htmlminify = require('gulp-htmlmin');
 const del = require('del');
 
+const fs = require('fs');
+const path = require('path');
+
 
 const DEPLOYMENT = process.env.DEPLOYMENT;
 console.log('Building for ' + DEPLOYMENT);
@@ -105,6 +108,16 @@ gulp.task('posenetmodel', function() {
         { url : 'https://storage.googleapis.com/tfjs-models/savedmodel/posenet/mobilenet/float/075/group1-shard1of2.bin', file : 'group1-shard1of2.bin' },
         { url : 'https://storage.googleapis.com/tfjs-models/savedmodel/posenet/mobilenet/float/075/group1-shard2of2.bin', file : 'group1-shard2of2.bin' }
     ];
+
+    // 如果只要有一个文件存在，就直接跳过
+    const targetDir = 'web/static/bower_components/tensorflow-models/posenet';
+    const anyExist = files.some(f => fs.existsSync(path.join(targetDir, f.file)));
+
+    if (anyExist) {
+        console.log('posenetmodel: 已存在文件，跳过下载');
+        return Promise.resolve();
+    }
+
     return download(files)
         .pipe(gulp.dest('web/static/bower_components/tensorflow-models/posenet'));
 });
@@ -125,6 +138,16 @@ gulp.task('speechcommandsmodel', function() {
         { url : 'https://storage.googleapis.com/tfjs-models/tfjs/speech-commands/v0.5/browser_fft/18w/group1-shard1of2', file : 'group1-shard1of2' },
         { url : 'https://storage.googleapis.com/tfjs-models/tfjs/speech-commands/v0.5/browser_fft/18w/group1-shard2of2', file : 'group1-shard2of2' }
     ];
+
+    // 如果只要有一个文件存在，就直接跳过
+    const targetDir = 'web/static/bower_components/tensorflow-models/speech-commands';
+    const anyExist = files.some(f => fs.existsSync(path.join(targetDir, f.file)));
+
+    if (anyExist) {
+        console.log('posenetmodel: 已存在文件，跳过下载');
+        return Promise.resolve();
+    }
+
     return download(files)
         .pipe(gulp.dest('web/static/bower_components/tensorflow-models/speech-commands'));
 });
@@ -135,6 +158,16 @@ gulp.task('speechcommandsmodel-scratch', function() {
         { url : 'https://storage.googleapis.com/tfjs-models/tfjs/speech-commands/v0.5/browser_fft/18w/group1-shard1of2', file : 'group1-shard1of2' },
         { url : 'https://storage.googleapis.com/tfjs-models/tfjs/speech-commands/v0.5/browser_fft/18w/group1-shard2of2', file : 'group1-shard2of2' }
     ];
+
+    // 如果只要有一个文件存在，就直接跳过
+    const targetDir = 'web/static/bower_components/tensorflow-models/speech-commands-scratch';
+    const anyExist = files.some(f => fs.existsSync(path.join(targetDir, f.file)));
+
+    if (anyExist) {
+        console.log('posenetmodel: 已存在文件，跳过下载');
+        return Promise.resolve();
+    }
+
     return download(files)
         .pipe(gulp.dest('web/static/bower_components/tensorflow-models/speech-commands-scratch'));
 });
@@ -160,6 +193,16 @@ gulp.task('imagerecognitionmodel', function() {
             file : filename
         });
     }
+
+    // 如果只要有一个文件存在，就直接跳过
+    const targetDir = 'web/static/bower_components/tensorflow-models/image-recognition';
+    const anyExist = files.some(f => fs.existsSync(path.join(targetDir, f.file)));
+
+    if (anyExist) {
+        console.log('posenetmodel: 已存在文件，跳过下载');
+        return Promise.resolve();
+    }
+
     return download(files)
         .pipe(gulp.dest('web/static/bower_components/tensorflow-models/image-recognition'));
 });
@@ -174,6 +217,16 @@ gulp.task('imagerecognitionmodel-scratch', function() {
             file : filename
         });
     }
+
+    // 如果只要有一个文件存在，就直接跳过
+    const targetDir = 'web/static/bower_components/tensorflow-models/image-recognition-scratch';
+    const anyExist = files.some(f => fs.existsSync(path.join(targetDir, f.file)));
+
+    if (anyExist) {
+        console.log('posenetmodel: 已存在文件，跳过下载');
+        return Promise.resolve();
+    }
+
     return download(files)
         .pipe(gulp.dest('web/static/bower_components/tensorflow-models/image-recognition-scratch'));
 });
@@ -392,7 +445,7 @@ gulp.task('default', gulp.series('build', 'test'));
 
 gulp.task('buildprod',
     gulp.series(
-        'clean',
+        // 'clean',
         'uidependencies',
         gulp.parallel(
             'robotstxt',

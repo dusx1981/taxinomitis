@@ -136,8 +136,10 @@ export function setupUI(app: express.Application): void {
     app.get('/pretrained', (req, res) => { res.redirect('/#!/pretrained'); });
     app.get('/book', (req, res) => { res.redirect('/#!/book'); });
 
-    app.get('/scratch', (req, res) => { res.redirect('/scratch/'); });
-    app.get('/scratch3', (req, res) => { res.redirect('/scratch/'); });
+    // app.get('/scratch', (req, res) => { res.redirect('/scratch/'); });
+    // app.get('/scratch3', (req, res) => { res.redirect('/scratch/'); });
+    const scratchlocation: string = path.join(__dirname, '/../../../../mlforkids-scratch/scratch3');
+    app.use('/scratch', compression(), express.static(scratchlocation, { maxAge : constants.FIVE_MINUTES }));
 
     const stories = [
         'ml-hasnt-replaced-coding',

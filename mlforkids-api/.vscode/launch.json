@@ -1,0 +1,63 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Debug: app.ts (ts-node)",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/src/lib/app.ts",
+      "runtimeArgs": [
+        "--require",
+        "ts-node/register"
+      ],
+      "cwd": "${workspaceFolder}",
+      "env": {
+        "NODE_ENV": "development",
+        "TS_NODE_PROJECT": "${workspaceFolder}/tsconfig.json"
+      },
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "sourceMaps": true,
+      // "outFiles": [
+      //   "${workspaceFolder}/dist/**/*.js"
+      // ]
+    },
+    {
+      "name": "Debug: app.ts (ts-node, transpile-only)",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/src/lib/app.ts",
+      "runtimeArgs": [
+        "--require",
+        "ts-node/register/transpile-only"
+      ],
+      "cwd": "${workspaceFolder}",
+      "env": {
+        "NODE_ENV": "development",
+        "TS_NODE_PROJECT": "${workspaceFolder}/tsconfig.json"
+      },
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "sourceMaps": true,
+      // "outFiles": [
+      //   "${workspaceFolder}/dist/**/*.js"
+      // ]
+    },
+    {
+      "name": "Debug: dist/app.js (compiled)",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/dist/lib/app.js",
+      "cwd": "${workspaceFolder}",
+      "env": {
+        "NODE_ENV": "development"
+      },
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "sourceMaps": true,
+      "outFiles": [
+        "${workspaceFolder}/dist/**/*.js"
+      ]
+    }
+  ]
+}
