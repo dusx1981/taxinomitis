@@ -14,3 +14,5 @@ ops/de-routes.sh
 ops/au-routes.sh
 ops/scaling-*.json
 ops/ibmcloud-login.md
+
+imgs/*.log
