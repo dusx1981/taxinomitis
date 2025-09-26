@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Download Speech Commands Model</title>
+</head>
+<body>
+  <button id="downloadBtn">下载 Speech Commands 模型文件</button>
+
+  <script>
+    async function downloadModel() {
+      // 用户选择一个文件夹
+      const dirHandle = await window.showDirectoryPicker();
+
+      const files = [
+        { 
+          url: "https://storage.googleapis.com/tfjs-models/tfjs/speech-commands/v0.5/browser_fft/18w/metadata.json", 
+          file: "metadata.json" 
+        },
+        { 
+          url: "https://storage.googleapis.com/tfjs-models/tfjs/speech-commands/v0.5/browser_fft/18w/model.json", 
+          file: "model.json" 
+        },
+        { 
+          url: "https://storage.googleapis.com/tfjs-models/tfjs/speech-commands/v0.5/browser_fft/18w/group1-shard1of2", 
+          file: "group1-shard1of2" 
+        },
+        { 
+          url: "https://storage.googleapis.com/tfjs-models/tfjs/speech-commands/v0.5/browser_fft/18w/group1-shard2of2", 
+          file: "group1-shard2of2" 
+        }
+      ];
+
+      for (const f of files) {
+        console.log("下载中:", f.url);
+        const response = await fetch(f.url);
+        if (!response.ok) throw new Error("下载失败：" + f.url);
+        const blob = await response.blob();
+
+        // 在目标文件夹中写入文件
+        const fileHandle = await dirHandle.getFileHandle(f.file, { create: true });
+        const writable = await fileHandle.createWritable();
+        await writable.write(blob);
+        await writable.close();
+      }
+
+      alert("Speech Commands 模型文件已全部保存！");
+    }
+
+    document.getElementById("downloadBtn").addEventListener("click", downloadModel);
+  </script>
+</body>
+</html>

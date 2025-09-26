@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Download PoseNet Model</title>
+</head>
+<body>
+  <button id="downloadBtn">下载 PoseNet 模型文件</button>
+
+  <script>
+    async function downloadModel() {
+      // 用户选择一个目标文件夹
+      const dirHandle = await window.showDirectoryPicker();
+
+      const files = [
+        { 
+          url: "https://storage.googleapis.com/tfjs-models/savedmodel/posenet/mobilenet/float/075/model-stride16.json", 
+          file: "model-multiplier75-stride16.json" 
+        },
+        { 
+          url: "https://storage.googleapis.com/tfjs-models/savedmodel/posenet/mobilenet/float/075/group1-shard1of2.bin", 
+          file: "group1-shard1of2.bin" 
+        },
+        { 
+          url: "https://storage.googleapis.com/tfjs-models/savedmodel/posenet/mobilenet/float/075/group1-shard2of2.bin", 
+          file: "group1-shard2of2.bin" 
+        }
+      ];
+
+      for (const f of files) {
+        console.log("下载中:", f.url);
+        const response = await fetch(f.url);
+        if (!response.ok) throw new Error("下载失败：" + f.url);
+        const blob = await response.blob();
+
+        // 在用户选定的文件夹里写入文件
+        const fileHandle = await dirHandle.getFileHandle(f.file, { create: true });
+        const writable = await fileHandle.createWritable();
+        await writable.write(blob);
+        await writable.close();
+      }
+
+      alert("PoseNet 模型文件已全部保存！");
+    }
+
+    document.getElementById("downloadBtn").addEventListener("click", downloadModel);
+  </script>
+</body>
+</html>
