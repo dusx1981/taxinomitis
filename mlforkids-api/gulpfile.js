@@ -102,25 +102,59 @@ gulp.task('tensorflowposenet', function() {
         'node_modules/tensorflow-models-posenet/dist/posenet.min.js'
     ], { encoding : false }).pipe(gulp.dest('web/static/bower_components/tensorflow-models/posenet'));
 });
+
+// gulp.task('posenetmodel', function() {
+//     const files = [
+//         { url : 'https://storage.googleapis.com/tfjs-models/savedmodel/posenet/mobilenet/float/075/model-stride16.json', file : 'model-multiplier75-stride16.json' },
+//         { url : 'https://storage.googleapis.com/tfjs-models/savedmodel/posenet/mobilenet/float/075/group1-shard1of2.bin', file : 'group1-shard1of2.bin' },
+//         { url : 'https://storage.googleapis.com/tfjs-models/savedmodel/posenet/mobilenet/float/075/group1-shard2of2.bin', file : 'group1-shard2of2.bin' }
+//     ];
+
+//     // 如果只要有一个文件存在，就直接跳过
+//     const targetDir = 'web/static/bower_components/tensorflow-models/posenet';
+//     const anyExist = files.some(f => fs.existsSync(path.join(targetDir, f.file)));
+
+//     if (anyExist) {
+//         console.log('posenetmodel: 已存在文件，跳过下载');
+//         return Promise.resolve();
+//     }
+
+//     return download(files)
+//         .pipe(gulp.dest('web/static/bower_components/tensorflow-models/posenet'));
+// });
 gulp.task('posenetmodel', function() {
     const files = [
-        { url : 'https://storage.googleapis.com/tfjs-models/savedmodel/posenet/mobilenet/float/075/model-stride16.json', file : 'model-multiplier75-stride16.json' },
-        { url : 'https://storage.googleapis.com/tfjs-models/savedmodel/posenet/mobilenet/float/075/group1-shard1of2.bin', file : 'group1-shard1of2.bin' },
-        { url : 'https://storage.googleapis.com/tfjs-models/savedmodel/posenet/mobilenet/float/075/group1-shard2of2.bin', file : 'group1-shard2of2.bin' }
+        { file: 'model-multiplier75-stride16.json' },
+        { file: 'group1-shard1of2.bin' },
+        { file: 'group1-shard2of2.bin' }
     ];
 
-    // 如果只要有一个文件存在，就直接跳过
+    const sourceDir = '../models/posenet'; // 上级目录中的 models/posenet
     const targetDir = 'web/static/bower_components/tensorflow-models/posenet';
+    
+    // 检查目标目录中是否已存在任何文件
     const anyExist = files.some(f => fs.existsSync(path.join(targetDir, f.file)));
-
+    
     if (anyExist) {
-        console.log('posenetmodel: 已存在文件，跳过下载');
+        console.log('posenetmodel: 目标路径已存在文件，跳过拷贝');
         return Promise.resolve();
     }
-
-    return download(files)
-        .pipe(gulp.dest('web/static/bower_components/tensorflow-models/posenet'));
+    
+    // 检查源目录中是否存在所有需要的文件
+    const allSourceExist = files.every(f => fs.existsSync(path.join(sourceDir, f.file)));
+    
+    if (!allSourceExist) {
+        console.log('posenetmodel: 错误 - 源目录中缺少必要的文件');
+        console.log('请确保以下文件存在于 ' + sourceDir + ' 目录中:');
+        files.forEach(f => console.log('  - ' + f.file));
+        return Promise.reject('源文件不完整');
+    }
+    
+    // 使用 gulp.src 从源目录拷贝文件到目标目录
+    return gulp.src(files.map(f => path.join(sourceDir, f.file)))
+        .pipe(gulp.dest(targetDir));
 });
+
 gulp.task('tensorflowspeechcommands', function() {
     return gulp.src([
         'node_modules/tensorflow-models-speech-commands/dist/speech-commands.min.js'
@@ -131,46 +165,115 @@ gulp.task('tensorflowspeechcommands-scratch', function() {
         'node_modules/tensorflow-models-speech-commands/dist/speech-commands.min.js'
     ], { encoding : false }).pipe(gulp.dest('web/static/bower_components/tensorflow-models/speech-commands-scratch'));
 });
+
+// gulp.task('speechcommandsmodel', function() {
+//     const files = [
+//         { url : 'https://storage.googleapis.com/tfjs-models/tfjs/speech-commands/v0.5/browser_fft/18w/metadata.json', file : 'metadata.json' },
+//         { url : 'https://storage.googleapis.com/tfjs-models/tfjs/speech-commands/v0.5/browser_fft/18w/model.json', file : 'model.json' },
+//         { url : 'https://storage.googleapis.com/tfjs-models/tfjs/speech-commands/v0.5/browser_fft/18w/group1-shard1of2', file : 'group1-shard1of2' },
+//         { url : 'https://storage.googleapis.com/tfjs-models/tfjs/speech-commands/v0.5/browser_fft/18w/group1-shard2of2', file : 'group1-shard2of2' }
+//     ];
+
+//     // 如果只要有一个文件存在，就直接跳过
+//     const targetDir = 'web/static/bower_components/tensorflow-models/speech-commands';
+//     const anyExist = files.some(f => fs.existsSync(path.join(targetDir, f.file)));
+
+//     if (anyExist) {
+//         console.log('posenetmodel: 已存在文件，跳过下载');
+//         return Promise.resolve();
+//     }
+
+//     return download(files)
+//         .pipe(gulp.dest('web/static/bower_components/tensorflow-models/speech-commands'));
+// });
 gulp.task('speechcommandsmodel', function() {
     const files = [
-        { url : 'https://storage.googleapis.com/tfjs-models/tfjs/speech-commands/v0.5/browser_fft/18w/metadata.json', file : 'metadata.json' },
-        { url : 'https://storage.googleapis.com/tfjs-models/tfjs/speech-commands/v0.5/browser_fft/18w/model.json', file : 'model.json' },
-        { url : 'https://storage.googleapis.com/tfjs-models/tfjs/speech-commands/v0.5/browser_fft/18w/group1-shard1of2', file : 'group1-shard1of2' },
-        { url : 'https://storage.googleapis.com/tfjs-models/tfjs/speech-commands/v0.5/browser_fft/18w/group1-shard2of2', file : 'group1-shard2of2' }
+        { file: 'metadata.json' },
+        { file: 'model.json' },
+        { file: 'group1-shard1of2' },
+        { file: 'group1-shard2of2' }
     ];
 
-    // 如果只要有一个文件存在，就直接跳过
+    const sourceDir = '../models/speech-commands'; // 上级目录中的 models/speech-commands
     const targetDir = 'web/static/bower_components/tensorflow-models/speech-commands';
+    
+    // 检查目标目录中是否已存在任何文件
     const anyExist = files.some(f => fs.existsSync(path.join(targetDir, f.file)));
-
+    
     if (anyExist) {
-        console.log('posenetmodel: 已存在文件，跳过下载');
+        console.log('speechcommandsmodel: 目标路径已存在文件，跳过拷贝');
         return Promise.resolve();
     }
-
-    return download(files)
-        .pipe(gulp.dest('web/static/bower_components/tensorflow-models/speech-commands'));
+    
+    // 检查源目录中是否存在所有需要的文件
+    const allSourceExist = files.every(f => fs.existsSync(path.join(sourceDir, f.file)));
+    
+    if (!allSourceExist) {
+        console.log('speechcommandsmodel: 错误 - 源目录中缺少必要的文件');
+        console.log('请确保以下文件存在于 ' + sourceDir + ' 目录中:');
+        files.forEach(f => console.log('  - ' + f.file));
+        return Promise.reject('源文件不完整');
+    }
+    
+    // 使用 gulp.src 从源目录拷贝文件到目标目录
+    return gulp.src(files.map(f => path.join(sourceDir, f.file)))
+        .pipe(gulp.dest(targetDir));
 });
+
+// gulp.task('speechcommandsmodel-scratch', function() {
+//     const files = [
+//         { url : 'https://storage.googleapis.com/tfjs-models/tfjs/speech-commands/v0.5/browser_fft/18w/metadata.json', file : 'metadata.json' },
+//         { url : 'https://storage.googleapis.com/tfjs-models/tfjs/speech-commands/v0.5/browser_fft/18w/model.json', file : 'model.json' },
+//         { url : 'https://storage.googleapis.com/tfjs-models/tfjs/speech-commands/v0.5/browser_fft/18w/group1-shard1of2', file : 'group1-shard1of2' },
+//         { url : 'https://storage.googleapis.com/tfjs-models/tfjs/speech-commands/v0.5/browser_fft/18w/group1-shard2of2', file : 'group1-shard2of2' }
+//     ];
+
+//     // 如果只要有一个文件存在，就直接跳过
+//     const targetDir = 'web/static/bower_components/tensorflow-models/speech-commands-scratch';
+//     const anyExist = files.some(f => fs.existsSync(path.join(targetDir, f.file)));
+
+//     if (anyExist) {
+//         console.log('posenetmodel: 已存在文件，跳过下载');
+//         return Promise.resolve();
+//     }
+
+//     return download(files)
+//         .pipe(gulp.dest('web/static/bower_components/tensorflow-models/speech-commands-scratch'));
+// });
 gulp.task('speechcommandsmodel-scratch', function() {
     const files = [
-        { url : 'https://storage.googleapis.com/tfjs-models/tfjs/speech-commands/v0.5/browser_fft/18w/metadata.json', file : 'metadata.json' },
-        { url : 'https://storage.googleapis.com/tfjs-models/tfjs/speech-commands/v0.5/browser_fft/18w/model.json', file : 'model.json' },
-        { url : 'https://storage.googleapis.com/tfjs-models/tfjs/speech-commands/v0.5/browser_fft/18w/group1-shard1of2', file : 'group1-shard1of2' },
-        { url : 'https://storage.googleapis.com/tfjs-models/tfjs/speech-commands/v0.5/browser_fft/18w/group1-shard2of2', file : 'group1-shard2of2' }
+        { file: 'metadata.json' },
+        { file: 'model.json' },
+        { file: 'group1-shard1of2' },
+        { file: 'group1-shard2of2' }
     ];
 
-    // 如果只要有一个文件存在，就直接跳过
+    const sourceDir = '../models/speech-commands'; // 上级目录中的 models/speech-commands
     const targetDir = 'web/static/bower_components/tensorflow-models/speech-commands-scratch';
+    
+    // 检查目标目录中是否已存在任何文件
     const anyExist = files.some(f => fs.existsSync(path.join(targetDir, f.file)));
-
+    
     if (anyExist) {
-        console.log('posenetmodel: 已存在文件，跳过下载');
+        console.log('speechcommandsmodel-scratch: 目标路径已存在文件，跳过拷贝');
         return Promise.resolve();
     }
-
-    return download(files)
-        .pipe(gulp.dest('web/static/bower_components/tensorflow-models/speech-commands-scratch'));
+    
+    // 检查源目录中是否存在所有需要的文件
+    const allSourceExist = files.every(f => fs.existsSync(path.join(sourceDir, f.file)));
+    
+    if (!allSourceExist) {
+        console.log('speechcommandsmodel-scratch: 错误 - 源目录中缺少必要的文件');
+        console.log('请确保以下文件存在于 ' + sourceDir + ' 目录中:');
+        files.forEach(f => console.log('  - ' + f.file));
+        return Promise.reject('源文件不完整');
+    }
+    
+    // 使用 gulp.src 从源目录拷贝文件到目标目录
+    return gulp.src(files.map(f => path.join(sourceDir, f.file)))
+        .pipe(gulp.dest(targetDir));
 });
+
 gulp.task('tensorflowfacelandmarks', function() {
     return gulp.src([
         'node_modules/tensorflow-models-face-landmarks-detection/dist/face-landmarks-detection.min.js'
@@ -182,53 +285,130 @@ gulp.task('tensorflowfacemesh', function() {
     ], { encoding : false }).pipe(gulp.dest('web/static/bower_components/tensorflow-models/face-mesh'));
 });
 
+// gulp.task('imagerecognitionmodel', function() {
+//     const files = [
+//         { url : 'https://storage.googleapis.com/tfjs-models/tfjs/mobilenet_v1_0.25_224/model.json', file : 'model.json' }
+//     ];
+//     for (var x = 1; x <= 55; x++) {
+//         const filename = 'group' + x + '-shard1of1';
+//         files.push({
+//             url : 'https://storage.googleapis.com/tfjs-models/tfjs/mobilenet_v1_0.25_224/' + filename,
+//             file : filename
+//         });
+//     }
+
+//     // 如果只要有一个文件存在，就直接跳过
+//     const targetDir = 'web/static/bower_components/tensorflow-models/image-recognition';
+//     const anyExist = files.some(f => fs.existsSync(path.join(targetDir, f.file)));
+
+//     if (anyExist) {
+//         console.log('posenetmodel: 已存在文件，跳过下载');
+//         return Promise.resolve();
+//     }
+
+//     return download(files)
+//         .pipe(gulp.dest('web/static/bower_components/tensorflow-models/image-recognition'));
+// });
 gulp.task('imagerecognitionmodel', function() {
     const files = [
-        { url : 'https://storage.googleapis.com/tfjs-models/tfjs/mobilenet_v1_0.25_224/model.json', file : 'model.json' }
+        { file: 'model.json' }
     ];
     for (var x = 1; x <= 55; x++) {
         const filename = 'group' + x + '-shard1of1';
-        files.push({
-            url : 'https://storage.googleapis.com/tfjs-models/tfjs/mobilenet_v1_0.25_224/' + filename,
-            file : filename
-        });
+        files.push({ file: filename });
     }
 
-    // 如果只要有一个文件存在，就直接跳过
+    const sourceDir = '../models/image-recognition'; // 上级目录中的 models/image-recognition
     const targetDir = 'web/static/bower_components/tensorflow-models/image-recognition';
+    
+    // 检查目标目录中是否已存在任何文件
     const anyExist = files.some(f => fs.existsSync(path.join(targetDir, f.file)));
-
+    
     if (anyExist) {
-        console.log('posenetmodel: 已存在文件，跳过下载');
+        console.log('imagerecognitionmodel: 目标路径已存在文件，跳过拷贝');
         return Promise.resolve();
     }
-
-    return download(files)
-        .pipe(gulp.dest('web/static/bower_components/tensorflow-models/image-recognition'));
+    
+    // 检查源目录中是否存在所有需要的文件
+    const allSourceExist = files.every(f => fs.existsSync(path.join(sourceDir, f.file)));
+    
+    if (!allSourceExist) {
+        console.log('imagerecognitionmodel: 错误 - 源目录中缺少必要的文件');
+        console.log('请确保以下文件存在于 ' + sourceDir + ' 目录中:');
+        // 只列出前几个文件作为示例，避免输出过多
+        files.slice(0, 5).forEach(f => console.log('  - ' + f.file));
+        if (files.length > 5) {
+            console.log('  以及另外 ' + (files.length - 5) + ' 个文件');
+        }
+        return Promise.reject('源文件不完整');
+    }
+    
+    // 使用 gulp.src 从源目录拷贝文件到目标目录
+    return gulp.src(files.map(f => path.join(sourceDir, f.file)))
+        .pipe(gulp.dest(targetDir));
 });
+
+// gulp.task('imagerecognitionmodel-scratch', function() {
+//     const files = [
+//         { url : 'https://storage.googleapis.com/tfjs-models/tfjs/mobilenet_v1_0.25_224/model.json', file : 'model.json' }
+//     ];
+//     for (var x = 1; x <= 55; x++) {
+//         const filename = 'group' + x + '-shard1of1';
+//         files.push({
+//             url : 'https://storage.googleapis.com/tfjs-models/tfjs/mobilenet_v1_0.25_224/' + filename,
+//             file : filename
+//         });
+//     }
+
+//     // 如果只要有一个文件存在，就直接跳过
+//     const targetDir = 'web/static/bower_components/tensorflow-models/image-recognition-scratch';
+//     const anyExist = files.some(f => fs.existsSync(path.join(targetDir, f.file)));
+
+//     if (anyExist) {
+//         console.log('posenetmodel: 已存在文件，跳过下载');
+//         return Promise.resolve();
+//     }
+
+//     return download(files)
+//         .pipe(gulp.dest('web/static/bower_components/tensorflow-models/image-recognition-scratch'));
+// });
 gulp.task('imagerecognitionmodel-scratch', function() {
     const files = [
-        { url : 'https://storage.googleapis.com/tfjs-models/tfjs/mobilenet_v1_0.25_224/model.json', file : 'model.json' }
+        { file: 'model.json' }
     ];
     for (var x = 1; x <= 55; x++) {
         const filename = 'group' + x + '-shard1of1';
-        files.push({
-            url : 'https://storage.googleapis.com/tfjs-models/tfjs/mobilenet_v1_0.25_224/' + filename,
-            file : filename
-        });
+        files.push({ file: filename });
     }
 
-    // 如果只要有一个文件存在，就直接跳过
+    const sourceDir = '../models/image-recognition-scratch'; // 上级目录中的 models/image-recognition-scratch
     const targetDir = 'web/static/bower_components/tensorflow-models/image-recognition-scratch';
+    
+    // 检查目标目录中是否已存在任何文件
     const anyExist = files.some(f => fs.existsSync(path.join(targetDir, f.file)));
-
+    
     if (anyExist) {
-        console.log('posenetmodel: 已存在文件，跳过下载');
+        console.log('imagerecognitionmodel-scratch: 目标路径已存在文件，跳过拷贝');
         return Promise.resolve();
     }
-
-    return download(files)
-        .pipe(gulp.dest('web/static/bower_components/tensorflow-models/image-recognition-scratch'));
+    
+    // 检查源目录中是否存在所有需要的文件
+    const allSourceExist = files.every(f => fs.existsSync(path.join(sourceDir, f.file)));
+    
+    if (!allSourceExist) {
+        console.log('imagerecognitionmodel-scratch: 错误 - 源目录中缺少必要的文件');
+        console.log('请确保以下文件存在于 ' + sourceDir + ' 目录中:');
+        // 只列出前几个文件作为示例，避免输出过多
+        files.slice(0, 5).forEach(f => console.log('  - ' + f.file));
+        if (files.length > 5) {
+            console.log('  以及另外 ' + (files.length - 5) + ' 个文件');
+        }
+        return Promise.reject('源文件不完整');
+    }
+    
+    // 使用 gulp.src 从源目录拷贝文件到目标目录
+    return gulp.src(files.map(f => path.join(sourceDir, f.file)))
+        .pipe(gulp.dest(targetDir));
 });
 
 gulp.task('tensorflowhandposemodel', function() {
