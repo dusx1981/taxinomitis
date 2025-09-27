@@ -1,8 +1,5 @@
 #!/bin/bash
 
-# 停止可能正在运行的服务器
-pkill -f "python3 -m http.server 9000"
-
 # 启动自定义HTTP服务器
 echo "Starting custom HTTP server on port 9000..."
 nohup python3 image_server.py 9000 > server.log 2>&1 &
