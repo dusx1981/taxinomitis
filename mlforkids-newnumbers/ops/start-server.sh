@@ -16,10 +16,10 @@ nohup env \
 MODE=development \
 MPLBACKEND=svg \
 MODELS_CACHE_SIZE=3 \
-PUBLIC_API_URL=http://127.0.0.1:8000 \
+PUBLIC_API_URL=http://39.97.179.168:8000 \
 VERIFY_USER=testuser \
 VERIFY_PASSWORD=testpass \
-uvicorn app.main:app --reload --port 8000 > logs/server.log 2>&1 &
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8000 > logs/server.log 2>&1 &
 
 # 显示进程信息
 echo "Server started in background with PID: $!"
