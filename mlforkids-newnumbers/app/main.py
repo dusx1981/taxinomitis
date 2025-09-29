@@ -29,6 +29,7 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "http://localhost:3000",
+        "http://39.97.179.168:3000",
         "https://machinelearningforkids.co.uk"
     ]
 )
@@ -99,12 +100,12 @@ async def model_training_request(scratch_key: str, csvfile: UploadFile,
     info("%s : Returning status", scratch_key)
     return savedmodel
 
-# if __name__ == "__main__":
-#     import uvicorn
-#     uvicorn.run(
-#         "app.main:app", 
-#         host="0.0.0.0", 
-#         port=8000, 
-#         reload=True,
-#         log_level="debug"
-#     )
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(
+        "app.main:app", 
+        host="0.0.0.0", 
+        port=8000, 
+        reload=True,
+        log_level="debug"
+    )
