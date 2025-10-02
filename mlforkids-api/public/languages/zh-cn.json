@@ -2096,7 +2096,7 @@
         "HOWTO": {
             "TITLE": "使用方法",
             "INTRO": "点击按钮进入Scratch。",
-            "HOW_1": "前往儿童机器学习提供的<a href='https://machinelearningforkids.co.uk/scratch/'>Scratch 3</a>版本。",
+            "HOW_1": "前往儿童机器学习提供的<a href='http://39.97.179.168:3000/scratch/'>Scratch 3</a>版本。",
             "HOW_2": "预训练模型可从扩展面板获取。点击Scratch窗口左下角的蓝色扩展按钮找到它们，然后点击您想要添加到项目中的模型。",
             "HOW_3": "预训练模型的积木块将被添加到Scratch工具箱中。"
         },
