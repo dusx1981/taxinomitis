@@ -31,7 +31,7 @@
             }
             vm[type].push({
                 alertid : alertId++,
-                message : errObj.message || errObj.error || 'Unknown error',
+                message : errObj.message || errObj.error || '未知错误',
                 status : status
             });
         }
@@ -51,7 +51,7 @@
 
 
         function displayApiKeyCheckWarning(warning) {
-            loggerService.debug('[ml4kprojects] display api key check', warning);
+            loggerService.debug('[ml4kprojects] 显示 API 密钥检查', warning);
 
             if (translatedStrings['NEWPROJECT.WARNINGS.' + warning.code]) {
                 displayAlert('warnings', 409, {
@@ -67,16 +67,16 @@
             {
                 checkingProject.isPlaceholder = true;
 
-                loggerService.debug('[ml4kprojects] Checking class API keys');
+                loggerService.debug('[ml4kprojects] 检查班级 API 密钥');
                 projectsService.checkProjectCredentials(profile.tenant, checkingProject.type)
                     .then(function (support) {
-                        loggerService.debug('[ml4kprojects] API keys checked');
+                        loggerService.debug('[ml4kprojects] API 密钥已检查');
 
                         checkingProject.isPlaceholder = false;
                         displayApiKeyCheckWarning(support);
                     })
                     .catch(function (supporterr) {
-                        loggerService.error('[ml4kprojects] Failed to check API keys', supporterr);
+                        loggerService.error('[ml4kprojects] 检查 API 密钥失败', supporterr);
 
                         checkingProject.isPlaceholder = false;
                         displayApiKeyCheckWarning(supporterr);
@@ -86,11 +86,11 @@
 
 
         function refreshProjectsList(profile) {
-            loggerService.debug('[ml4kprojects] Refreshing projects list');
+            loggerService.debug('[ml4kprojects] 刷新项目列表');
 
             projectsService.getProjects(profile)
                 .then(function (projects) {
-                    loggerService.debug('[ml4kprojects] Got projects list');
+                    loggerService.debug('[ml4kprojects] 获取项目列表');
 
                     vm.projects = projects;
 
@@ -102,10 +102,10 @@
                             var columns = projectColumns
                                 .filter(col => col.output)
                                 .map(col => col.label);
-                            project.labelsSummary = modelService.generateProjectSummary(columns, ' and ') || 'something';
+                            project.labelsSummary = modelService.generateProjectSummary(columns, ' 和 ') || '某物';
                             var numInputs = projectColumns.length - columns.length;
                             if (numInputs > 0) {
-                                project.columnsSummary = ' from ' + numInputs + ' input values';
+                                project.columnsSummary = ' 来自 ' + numInputs + ' 个输入值';
                             }
                         }
                         else {
@@ -115,7 +115,7 @@
                                 }) :
                                 project.labels;
 
-                            project.labelsSummary = modelService.generateProjectSummary(labels, ' or ');
+                            project.labelsSummary = modelService.generateProjectSummary(labels, ' 或 ');
                         }
 
                         if (vm.highlightId === project.id) {
@@ -124,7 +124,7 @@
                     }
                 })
                 .catch(function (err) {
-                    loggerService.error('[ml4kprojects] Failed to refresh projects list', err);
+                    loggerService.error('[ml4kprojects] 刷新项目列表失败', err);
 
                     displayAlert('errors', err.status, err.data);
                 });
@@ -143,24 +143,24 @@
 
 
         vm.deleteProject = function (ev, project) {
-            loggerService.debug('[ml4kprojects] Deleting project');
+            loggerService.debug('[ml4kprojects] 删除项目');
 
             var confirm = $mdDialog.confirm()
-                .title('Are you sure?')
-                .textContent('Do you want to delete ' + project.name + '? (This cannot be undone)')
-                .ariaLabel('Confirm')
+                .title('您确定吗？')
+                .textContent('您确定要删除 ' + project.name + ' 吗？（此操作无法撤销）')
+                .ariaLabel('确认')
                 .targetEvent(ev)
-                .ok('Yes')
-                .cancel('No');
+                .ok('是')
+                .cancel('否');
 
             $mdDialog.show(confirm).then(
                 function() {
                     project.isPlaceholder = true;
 
-                    loggerService.debug('[ml4kprojects] Submitting project delete request');
+                    loggerService.debug('[ml4kprojects] 提交项目删除请求');
                     projectsService.deleteProject(project, vm.profile.user_id, vm.profile.tenant)
                         .then(function () {
-                            loggerService.debug('[ml4kprojects] Project deleted');
+                            loggerService.debug('[ml4kprojects] 项目已删除');
 
                             var idx = findProjectIndex(project.id);
                             if (idx !== -1) {
@@ -170,7 +170,7 @@
                                 refreshProjectsList(vm.profile);
                             }
 
-                            // delete local data associated with the project
+                            // 删除与项目相关的本地数据
                             cleanupService.deleteProject(project);
                             if (project.type === 'numbers') {
                                 browserStorageService.deleteAsset(project.id + '-model')
@@ -182,37 +182,37 @@
                                 browserStorageService.deleteAsset('language-model-' + project.id);
                             }
 
-                            // refresh view
+                            // 刷新视图
                             if (project.storage === 'local') {
                                 $scope.$apply();
                             }
                         })
                         .catch(function (err) {
-                            loggerService.error('[ml4kprojects] Failed to delete project', err);
+                            loggerService.error('[ml4kprojects] 删除项目失败', err);
 
                             displayAlert('errors', err.status, err.data);
                         });
                 },
                 function() {
-                    // cancelled. do nothing
+                    // 取消。不做任何操作
                 }
             );
         };
 
 
         vm.shareProject = function (ev, project, state) {
-            loggerService.debug('[ml4kprojects] Setting project share flag');
+            loggerService.debug('[ml4kprojects] 设置项目共享标志');
 
             project.isPlaceholder = true;
             projectsService.shareProject(project, vm.profile.user_id, vm.profile.tenant, state)
                 .then(function (newstate) {
-                    loggerService.debug('[ml4kprojects] Project share status updated');
+                    loggerService.debug('[ml4kprojects] 项目共享状态已更新');
 
                     project.isCrowdSourced = newstate;
                     project.isPlaceholder = false;
                 })
                 .catch(function (err) {
-                    loggerService.error('[ml4kprojects] Failed to share project', err);
+                    loggerService.error('[ml4kprojects] 共享项目失败', err);
 
                     project.isPlaceholder = false;
                     displayAlert('errors', err.status, err.data);
@@ -229,7 +229,7 @@
                   .title(translatedStrings['PROJECTS.WHOLE_CLASS_TITLE'])
                   .textContent(translatedStrings['PROJECTS.WHOLE_CLASS_NOTES'])
                   .ariaLabel(translatedStrings['PROJECTS.WHOLE_CLASS_TITLE'])
-                  .ok('OK')
+                  .ok('确定')
                   .targetEvent(ev)
               );
         };
@@ -239,7 +239,7 @@
             ev.preventDefault();
 
             let title;
-            let notes = '<p>(See "<a href="/help">' + translatedStrings['HELP.PROJECTS.Q5'] + '</a>")</p>';
+            let notes = '<p>（参见"<a href="/help">' + translatedStrings['HELP.PROJECTS.Q5'] + '</a>"）</p>';
             if (type === 'local') {
                 title = translatedStrings['PROJECTS.LOCAL_STORAGE_TITLE'];
                 notes = '<div><p>' + translatedStrings['PROJECTS.LOCAL_STORAGE_NOTES'] + '</p>' + notes + '</div>';
@@ -255,7 +255,7 @@
                   .title(title)
                   .htmlContent(notes)
                   .ariaLabel(title)
-                  .ok('OK')
+                  .ok('确定')
                   .targetEvent(ev)
               );
         };

@@ -1,7 +1,7 @@
-// external dependencies
+// 外部依赖
 import * as Express from 'express';
 import { status as httpstatus } from 'http-status';
-// local dependencies
+// 本地依赖
 import * as errors from './errors';
 import * as urls from './urls';
 import * as auth from './auth';
@@ -24,7 +24,7 @@ function createSiteAlert(req: Express.Request, res: Express.Response) {
         !req.body.severity || !req.body.expiry)
     {
         return res.status(httpstatus.BAD_REQUEST)
-                  .send({ error : 'Missing required field' });
+                  .send({ error : '缺少必填字段' });
     }
 
     store.storeSiteAlert(req.body.message,
@@ -42,7 +42,7 @@ function createSiteAlert(req: Express.Request, res: Express.Response) {
             if (err.statusCode === httpstatus.BAD_REQUEST) {
                 return res.status(httpstatus.BAD_REQUEST).json({ error : err.message });
             }
-            log.error({ err, func : 'createSiteAlert' }, 'Server error');
+            log.error({ err, func : 'createSiteAlert' }, '服务器错误');
             errors.unknownError(res, err);
         });
 }
@@ -54,7 +54,7 @@ function refreshSiteAlertCache(req: Express.Request, res: Express.Response) {
             return res.json({ ...alert, instance : process.env.CF_INSTANCE_INDEX });
         })
         .catch((err) => {
-            log.error({ err, func : 'refreshSiteAlertCache' }, 'Server error');
+            log.error({ err, func : 'refreshSiteAlertCache' }, '服务器错误');
             errors.unknownError(res, err);
         });
 }
@@ -86,7 +86,7 @@ function getMaintenanceModeSiteAlert(req: Express.Request, res: Express.Response
         timestamp: new Date(),
         severity: 'error',
         audience: 'public',
-        message: 'Machine Learning for Kids is temporarily unavailable for scheduled maintenance',
+        message: '儿童机器学习暂时不可用，正在进行计划维护',
     }]);
 }
 

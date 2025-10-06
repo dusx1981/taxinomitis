@@ -1,13 +1,13 @@
-// core dependencies
+// 核心依赖
 import * as fs from 'fs';
 import { IncomingHttpHeaders, IncomingMessage } from 'http';
 import { pipeline, Writable, Readable } from 'node:stream';
-// external dependencies
+// 外部依赖
 import { status as httpstatus } from 'http-status';
 import * as sharp from 'sharp';
 import * as got from 'mlforkids-got';
 import * as googleDns from 'mlforkids-google-dns';
-// local dependencies
+// 本地依赖
 import loggerSetup from './logger';
 
 const log = loggerSetup();
@@ -16,33 +16,33 @@ const log = loggerSetup();
 type IErrCallback = (err?: ML4KError) => void;
 
 
-// disable aggressive use of memory for caching
+// 禁用激进的内存缓存使用
 sharp.cache(false);
-// prevent sharp using multiple cores in parallel to reduce memory use
+// 防止 sharp 使用多核并行以减少内存使用
 sharp.concurrency(1);
 
-// standard options for downloading images
+// 下载图像的标准选项
 const REQUEST_OPTIONS = {
     http2 : true,
-    dnsCache : true, // replaced once googleDns module has loaded
+    dnsCache : true, // 在 googleDns 模块加载后替换
     timeout : { request : 20000 },
     https : { rejectUnauthorized : false },
     decompress : true,
     headers : {
-        // identify source of the request
-        //  partly as it's polite and good practice,
-        //  partly as some websites block requests that don't specify a user-agent
+        // 标识请求来源
+        //  部分原因是出于礼貌和良好实践，
+        //  部分原因是某些网站会阻止未指定用户代理的请求
         'User-Agent': 'machinelearningforkids.co.uk',
-        // prefer images if we have a choice
+        // 如果有选择，优先选择图像
         'Accept': 'image/png,image/jpeg,image/*,*/*',
-        // some servers block requests that don't include this
+        // 某些服务器会阻止不包含此内容的请求
         'Accept-Language': '*',
     },
     throwHttpErrors: false,
 };
 
 const RESIZE_OPTIONS = {
-    // skew, don't crop, when resizing
+    // 调整大小时进行拉伸，不裁剪
     fit : 'fill',
 } as sharp.ResizeOptions;
 
@@ -53,13 +53,13 @@ export interface ML4KError extends Error {
 
 
 /**
- * Downloads a file from the specified URL to the specified location on disk.
+ * 从指定 URL 下载文件到磁盘上的指定位置。
  *
- * @param url  - downloads from
- * @param targetFilePath  - writes to
+ * @param url  - 下载来源
+ * @param targetFilePath  - 写入位置
  */
 export function file(url: string, targetFilePath: string, callback: IErrCallback): void {
-    // local inner function used to avoid calling callback multiple times
+    // 用于避免多次调用回调的本地内部函数
     let resolved = false;
     function resolve(err?: ML4KError) {
         if (resolved === false) {
@@ -75,7 +75,7 @@ export function file(url: string, targetFilePath: string, callback: IErrCallback
         }
     }
 
-    // downloading from url
+    // 从 url 下载
     const readStream = got.stream(url, REQUEST_OPTIONS)
         .on('response', (r: IncomingMessage) => {
             const problem = recognizeCommonProblems(r, url);
@@ -87,13 +87,13 @@ export function file(url: string, targetFilePath: string, callback: IErrCallback
         .on('error', (err: Error) => {
             resolve(err as ML4KError);
         });
-    // writing to file
+    // 写入文件
     const writeStream = fs.createWriteStream(targetFilePath)
         .on('error', (err: Error) => {
             resolve(err as ML4KError);
         });
 
-    // joining the two streams
+    // 连接两个流
     pipeline(readStream, writeStream, (err) => {
         resolve(err as ML4KError);
     });
@@ -112,11 +112,11 @@ function cleanupStream(str: Readable | Writable): void {
 
 function reportDownloadFailure(url: string, err: ML4KError, callback: IErrCallback): void {
     if (err.ml4k) {
-        log.debug({ err, url }, 'download failure (for recognized reason)');
+        log.debug({ err, url }, '下载失败（已知原因）');
         callback(err);
     }
     else {
-        log.error({ err, url }, 'download failure');
+        log.error({ err, url }, '下载失败');
         callback(returnAsMl4kError(new Error(ERRORS.DOWNLOAD_FAIL + url)));
     }
 }
@@ -145,7 +145,7 @@ function recognizeCommonProblems(response: IncomingMessage, url: string): ML4KEr
             return returnAsMl4kError(new Error(safeGetHost(url) + ERRORS.DOWNLOAD_TOO_MANY_REQUESTS));
         }
 
-        log.error({ statusCode : response.statusCode, url }, 'Failed to request url');
+        log.error({ statusCode : response.statusCode, url }, '请求 URL 失败');
         return returnAsMl4kError(new Error(ERRORS.DOWNLOAD_FAIL + url));
     }
 
@@ -164,10 +164,10 @@ function recognizeCommonProblems(response: IncomingMessage, url: string): ML4KEr
 
 
 /**
- * Checks if the response headers for an image download suggest the
- * image will be too big to resize
+ * 检查图像下载的响应头是否表明
+ * 图像太大而无法调整大小
  *
- * @returns true - if the headers suggest the image is too big
+ * @returns true - 如果头信息表明图像太大
  */
 export function downloadTooBig(headers: IncomingHttpHeaders): boolean {
     if (headers['content-length']) {
@@ -179,11 +179,11 @@ export function downloadTooBig(headers: IncomingHttpHeaders): boolean {
             }
         }
         catch (err) {
-            log.error({ err, sizeStr }, 'Unable to parse content-length header');
+            log.error({ err, sizeStr }, '无法解析 content-length 头信息');
         }
     }
 
-    // assume it's probably okay
+    // 假设可能没问题
     return false;
 }
 
@@ -206,7 +206,7 @@ export function resizeUrl(url: string, width: number, height: number): Promise<B
 
         got.stream(url, REQUEST_OPTIONS)
             .on('error', (err: any) => {
-                log.warn({ err, url }, 'Download fail');
+                log.warn({ err, url }, '下载失败');
                 return reject(new Error(ERRORS.DOWNLOAD_FAIL + url));
             })
             .pipe(shrinkStream);
@@ -220,7 +220,7 @@ export function resizeBuffer(imagedata: Buffer, width: number, height: number): 
             .on('error', reject)
             .toBuffer((err, buff) => {
                 if (err) {
-                    log.error({ err }, 'Resize fail');
+                    log.error({ err }, '调整大小失败');
                     return reject(err);
                 }
                 return resolve(buff);
@@ -231,8 +231,8 @@ export function resizeBuffer(imagedata: Buffer, width: number, height: number): 
 
 
 /**
- * Return the host from a full URL. If the provided url string is not a valid
- * URL, return "The website" instead.
+ * 从完整 URL 返回主机名。如果提供的 url 字符串不是有效的
+ * URL，则返回 "该网站"。
  */
 function safeGetHost(url: string): string {
     try {
@@ -240,27 +240,27 @@ function safeGetHost(url: string): string {
         return parsed.hostname;
     }
     catch (err) {
-        log.debug({ url }, 'Failed to parse url');
-        return 'The website';
+        log.debug({ url }, '解析 URL 失败');
+        return '该网站';
     }
 }
 
 
 export const ERRORS = {
-    DOWNLOAD_FAIL : 'Unable to download image from ',
-    DOWNLOAD_FILETYPE_UNSUPPORTED : 'Unsupported image file type',
-    DOWNLOAD_FORBIDDEN : ' would not allow "Machine Learning for Kids" to use that image',
-    DOWNLOAD_TOO_BIG : 'The image is too big to use. Please choose a different image.',
-    DOWNLOAD_TOO_MANY_REQUESTS : ' is receiving too many requests for images and has started refusing access.'
+    DOWNLOAD_FAIL : '无法从以下位置下载图像：',
+    DOWNLOAD_FILETYPE_UNSUPPORTED : '不支持的图像文件类型',
+    DOWNLOAD_FORBIDDEN : ' 不允许"儿童机器学习"使用该图像',
+    DOWNLOAD_TOO_BIG : '图像太大无法使用。请选择其他图像。',
+    DOWNLOAD_TOO_MANY_REQUESTS : ' 收到太多图像请求并已开始拒绝访问。'
 };
 
 
-log.debug('setting up alternate DNS cache');
+log.debug('设置备用 DNS 缓存');
 googleDns.getCacheableLookup()
     .then((dnsCache: any) => {
         REQUEST_OPTIONS.dnsCache = dnsCache;
-        log.info('using Google DNS for downloading images');
+        log.info('使用 Google DNS 下载图像');
     })
     .catch((err: Error) => {
-        log.error({ err }, 'Unable to use Google DNS');
+        log.error({ err }, '无法使用 Google DNS');
     });

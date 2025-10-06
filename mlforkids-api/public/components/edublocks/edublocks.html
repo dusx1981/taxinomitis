@@ -24,33 +24,20 @@
         <a ui-sref="mlproject({ projectId : projectId, userId : userId  })" translate="APP.BACKTOPROJECT"></a>
     </div>
 
-    <!-- ------------------------------------- -->
-    <!--  page state :   LOADING               -->
-    <!--                                       -->
-    <!-- waiting to get info about the project -->
-    <!-- ------------------------------------- -->
+    <!-- 页面状态：加载中 -->
+    <!-- 等待获取项目信息 -->
     <div ng-if="projectId && !scratchkey" class="loading"> </div>
 
-
-    <!-- ---------------------------------------------- -->
-    <!--  page state :   TEXT/NUMBERS                   -->
-    <!--                                                -->
-    <!-- EduBlocks can only be used with text & numbers -->
-    <!-- ---------------------------------------------- -->
+    <!-- 页面状态：文本/数字项目 -->
+    <!-- EduBlocks 只能用于文本和数字项目 -->
     <div ng-if="project && (project.type !== 'text' && project.type !== 'numbers')" class="modelguidancecontainer">
         <div class="modelguidance">
-            EduBlocks can only be used with text and numbers projects.
+            EduBlocks 只能用于文本和数字项目。
         </div>
     </div>
 
-
-    <!-- ------------------------------------- -->
-    <!--  page state :   ONE LABEL             -->
-    <!--                                       -->
-    <!-- there is only one training bucket so  -->
-    <!--  we can't do anything until we have   -->
-    <!--  at least one more                    -->
-    <!-- ------------------------------------- -->
+    <!-- 页面状态：只有一个标签 -->
+    <!-- 只有一个训练类别，需要至少再添加一个 -->
     <div ng-if="project && project.labels.length <= 1 && (project.type === 'text' || project.type === 'numbers')" class="modelguidancecontainer">
         <div class="modelguidance">
             <div class="modelstatusdetail" translate="EDUBLOCKS.NOTREADY"></div>
@@ -58,29 +45,21 @@
         </div>
     </div>
 
-
     <div ng-if="scratchkey && project && project.labels.length > 1 && (project.type === 'text' || project.type === 'numbers')" class="appinvheader">
-        <!-- ------------------------------------- -->
-        <!--  page state :   NO MODEL              -->
-        <!--                                       -->
-        <!-- no model but we could use             -->
-        <!--  EduBlocks to create one              -->
-        <!-- ------------------------------------- -->
+        <!-- 页面状态：没有模型 -->
+        <!-- 没有模型，但可以使用 EduBlocks 创建一个 -->
         <div ng-if="!scratchkey.model">
             <div class="alert alert-info" role="alert" translate="SCRATCH.NOMODEL"></div>
             <div>
-                You can <strong><a href="" ui-sref="mlproject_models({ projectId : projectId, userId : userId })">train one now</a></strong> and then come back to start your EduBlocks project.
+                您可以<strong><a href="" ui-sref="mlproject_models({ projectId : projectId, userId : userId })">立即训练一个模型</a></strong>，然后回来开始您的 EduBlocks 项目。
             </div>
             <div>
-                Or you can go to <a class="btn btn-default" target="_blank" ng-click="openEdublocksLink('https://newapp.edublocks.org/showcase/WiN7B9z8wV1rY9BJjWAU', $event)">EduBlocks</a> now.
+                或者您现在就可以前往 <a class="btn btn-default" target="_blank" ng-click="openEdublocksLink('https://newapp.edublocks.org/showcase/WiN7B9z8wV1rY9BJjWAU', $event)">EduBlocks</a>。
             </div>
         </div>
 
-        <!-- ------------------------------------- -->
-        <!--  page state :   MODEL                 -->
-        <!--                                       -->
-        <!-- machine learning model is ready to go -->
-        <!-- ------------------------------------- -->
+        <!-- 页面状态：有模型 -->
+        <!-- 机器学习模型已准备就绪 -->
         <div ng-if="scratchkey.model">
             <a target="_blank" class="btn btn-primary"
                ng-click="openEdublocksLink('https://newapp.edublocks.org/showcase/WiN7B9z8wV1rY9BJjWAU', $event)"
@@ -88,23 +67,20 @@
         </div>
     </div>
 
-
     <div ng-if="project && project.labels.length > 1 && (project.type === 'text' || project.type === 'numbers')"
          class="modelguidancecontainer">
 
         <div class="modelguidance">
             <div class="modelstatusdetail">
-                You can use <strong><a href="https://edublocks.org/">EduBlocks</a></strong>
-                to make Python apps.
+                您可以使用 <strong><a href="https://edublocks.org/">EduBlocks</a></strong>
+                来制作 Python 应用程序。
             </div>
             <div class="modelstatusdetail">
-                It runs in a web browser, like Scratch. Like Scratch, you can write code
-                by dragging, dropping and snapping together blocks.
+                它像 Scratch 一样在网页浏览器中运行。和 Scratch 类似，您可以通过拖放和拼接积木来编写代码。
             </div>
             <div class="modelstatusdetail">
-                If you use <a href="https://edublocks.org/">EduBlocks</a> together
-                with <strong>Machine Learning for Kids</strong> you can make Python apps,
-                powered by artificial intelligence, using your own machine learning models.
+                如果您将 <a href="https://edublocks.org/">EduBlocks</a> 与
+                <strong>儿童机器学习</strong> 结合使用，您可以使用自己的机器学习模型制作由人工智能驱动的 Python 应用程序。
             </div>
         </div>
 
@@ -114,13 +90,13 @@
 
         <div class="modelguidance" style="flex-basis: 100%" ng-if="scratchkey">
             <div class="modelstatusdetail">
-                You will need to add your API key for this project to your EduBlocks code, where it says <code>API_KEY_HERE</code>:
+                您需要将此项目的 API 密钥添加到您的 EduBlocks 代码中，放在 <code>API_KEY_HERE</code> 的位置：
             </div>
             <div class="modelstatusdetail">
                 <div class="pythoncodebox"><pre class="pythoncode">{{ scratchkey.id }}</pre></div>
             </div>
             <div class="modelstatusdetail">
-                <em>Treat it like a password and make sure that you keep it secret!</em>
+                <em>请将其视为密码，确保妥善保管！</em>
             </div>
         </div>
     </div>

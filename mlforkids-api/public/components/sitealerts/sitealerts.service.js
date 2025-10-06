@@ -21,14 +21,14 @@
                 delete $rootScope.siteAlert;
             };
 
-            fetchSiteAlert({}, 'init');
+            fetchSiteAlert({}, '初始化');
 
             $rootScope.$on('authStateChange', fetchSiteAlert);
-            $interval(fetchSiteAlert, 1800000, 0, true, 'timer');
+            $interval(fetchSiteAlert, 1800000, 0, true, '定时器');
         }
 
         function getAlerts(endpoint, tenant, userid) {
-            loggerService.debug('[ml4kalert] getting alerts', endpoint, tenant, userid);
+            loggerService.debug('[ml4kalert] 获取警报', endpoint, tenant, userid);
             var url = '/api/sitealerts/public';
             if (endpoint === 'student') {
                 url = '/api/sitealerts/alerts/' + tenant + '/students/' + userid;
@@ -62,7 +62,7 @@
                             return getAlerts(profile.role, profile.tenant, profile.user_id);
                         }
                         else {
-                            return logError('Invalid profile');
+                            return logError('无效的用户资料');
                         }
                     })
                     .catch(logError);

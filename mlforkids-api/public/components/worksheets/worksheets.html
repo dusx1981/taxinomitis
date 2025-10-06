@@ -13,35 +13,35 @@
             <div class="filter-title" translate="WORKSHEETS.TYPES.LONGTITLE"></div>
             <div class="filter-options">
                 <md-radio-group ng-model="projecttype">
-                    <md-radio-button value="ALL" aria-label="All project types">
-                        <br/> <strong>All</strong>
+                    <md-radio-button value="ALL" aria-label="所有项目类型">
+                        <br/> <strong>全部</strong>
                         <md-tooltip md-direction="bottom" class="tooltipBody">{{ 'WORKSHEETS.TYPES.ALL' | translate }}</md-tooltip>
                     </md-radio-button>
-                    <md-radio-button value="text" aria-label="Text projects">
+                    <md-radio-button value="text" aria-label="文本项目">
                         {{ 'WORKSHEETS.TYPES.SHORTPREFIX' | translate }} <strong translate="WORKSHEETS.TYPES.TEXT"></strong>
                         <md-tooltip md-direction="bottom" class="tooltipBody">{{ 'WORKSHEETS.TYPES.DESCRIPTIONTEXT' | translate }}</md-tooltip>
                     </md-radio-button>
-                    <md-radio-button value="images" aria-label="Image projects">
+                    <md-radio-button value="images" aria-label="图像项目">
                         {{ 'WORKSHEETS.TYPES.SHORTPREFIX' | translate }} <strong translate="WORKSHEETS.TYPES.IMAGES"></strong>
                         <md-tooltip md-direction="bottom" class="tooltipBody">{{ 'WORKSHEETS.TYPES.DESCRIPTIONIMAGES' | translate }}</md-tooltip>
                     </md-radio-button>
-                    <md-radio-button value="numbers" aria-label="Number projects">
+                    <md-radio-button value="numbers" aria-label="数字项目">
                         {{ 'WORKSHEETS.TYPES.SHORTPREFIX' | translate }} <strong translate="WORKSHEETS.TYPES.NUMBERS"></strong>
                         <md-tooltip md-direction="bottom" class="tooltipBody">{{ 'WORKSHEETS.TYPES.DESCRIPTIONNUMBERS' | translate }}</md-tooltip>
                     </md-radio-button>
-                    <md-radio-button value="sounds" aria-label="Sound projects">
+                    <md-radio-button value="sounds" aria-label="声音项目">
                         {{ 'WORKSHEETS.TYPES.SHORTPREFIX' | translate }} <strong translate="WORKSHEETS.TYPES.SOUNDS"></strong>
                         <md-tooltip md-direction="bottom" class="tooltipBody">{{ 'WORKSHEETS.TYPES.DESCRIPTIONSOUNDS' | translate }}</md-tooltip>
                     </md-radio-button>
-                    <md-radio-button value="faces" aria-label="Face projects">
+                    <md-radio-button value="faces" aria-label="人脸项目">
                         {{ 'WORKSHEETS.TYPES.SHORTPREFIX' | translate }} <strong translate="WORKSHEETS.TYPES.FACES"></strong>
                         <md-tooltip md-direction="bottom" class="tooltipBody">{{ 'WORKSHEETS.TYPES.DESCRIPTIONFACES' | translate }}</md-tooltip>
                     </md-radio-button>
-                    <md-radio-button value="regression" aria-label="Regression projects">
+                    <md-radio-button value="regression" aria-label="回归项目">
                         {{ 'WORKSHEETS.TYPES.SHORTPREFIXREGRESSION' | translate }} <strong translate="WORKSHEETS.TYPES.NUMBERS"></strong>
                         <md-tooltip md-direction="bottom" class="tooltipBody">{{ 'WORKSHEETS.TYPES.DESCRIPTIONREGRESSION' | translate }}</md-tooltip>
                     </md-radio-button>
-                    <md-radio-button value="language" aria-label="Language projects">
+                    <md-radio-button value="language" aria-label="语言项目">
                         {{ 'WORKSHEETS.TYPES.SHORTPREFIXLANGUAGE' | translate }} <strong translate="WORKSHEETS.TYPES.TEXT"></strong>
                         <md-tooltip md-direction="bottom" class="tooltipBody">{{ 'WORKSHEETS.TYPES.DESCRIPTIONGENERATE' | translate }}</md-tooltip>
                     </md-radio-button>
@@ -52,8 +52,8 @@
             <div class="filter-title" translate="WORKSHEETS.LEVELS.TITLE"></div>
             <div class="filter-options">
                 <md-radio-group ng-model="projectdifficulty">
-                    <md-radio-button value="ALL" aria-label="All difficulty levels">
-                        <strong>All</strong>
+                    <md-radio-button value="ALL" aria-label="所有难度级别">
+                        <strong>全部</strong>
                         <md-tooltip md-direction="bottom" class="tooltipBody">{{ 'WORKSHEETS.LEVELS.ALL' | translate }}</md-tooltip>
                     </md-radio-button>
                     <md-radio-button value="1" aria-label="1">
@@ -84,8 +84,8 @@
             <div class="filter-title" translate="WORKSHEETS.MAKETYPES.TITLE"></div>
             <div class="filter-options">
                 <md-radio-group ng-model="projectmaketype">
-                    <md-radio-button value="ALL" aria-label="All make types">
-                        <strong>All</strong>
+                    <md-radio-button value="ALL" aria-label="所有制作类型">
+                        <strong>全部</strong>
                         <md-tooltip md-direction="bottom" class="tooltipBody">{{ 'WORKSHEETS.TYPES.ALL' | translate }}</md-tooltip>
                     </md-radio-button>
                     <md-radio-button value="scratch" aria-label="Scratch">
@@ -105,7 +105,7 @@
         <div class="worksheetframe-container">
             <iframe class="worksheetfeaturevideo"
                 ng-src="{{featuredWorksheetVideo}}"
-                title="YouTube video player"
+                title="YouTube 视频播放器"
                 frameborder="0"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                 referrerpolicy="strict-origin-when-cross-origin"
@@ -114,7 +114,7 @@
                 onload="this.style.display='block'; document.getElementById('worksheetfeaturevideofallback').style.display='none';"
                 onerror="this.style.display='none'; document.getElementById('worksheetfeaturevideofallback').style.display='block';"></iframe>
             <div id="worksheetfeaturevideofallback" class="worksheetfeaturevideo worksheetfeaturevideofallback" style="display: block;">
-                <img ng-src="{{featuredWorksheet.image}}" alt="screenshot">
+                <img ng-src="{{featuredWorksheet.image}}" alt="截图">
             </div>
         </div>
         <div class="description" ng-repeat="description in featuredWorksheet.featured" ng-bind-html="description"></div>
@@ -149,7 +149,7 @@
                 <span class="glyphicon glyphicon-download-alt"> </span> {{ 'WORKSHEETS.DOWNLOAD' | translate }}
             </a>
         </div>
-        <div class="featurelabel">Featured project</div>
+        <div class="featurelabel">精选项目</div>
     </div>
 </div>
 <div class="worksheets">
@@ -214,8 +214,8 @@
                      <md-tooltip md-direction="bottom" class="tooltipBody">{{ 'WORKSHEETS.MAKETYPES.DESCRIPTIONPYTHON' | translate }}</md-tooltip>
                      </span>
             </div>
-            <div class="tags" ng-hide="worksheet.providedby"><span class="heading">Tags:</span> {{ worksheet.tags.join(', ') }}</div>
-            <div class="tags" ng-if="worksheet.providedby"><span class="heading">Provided by:</span> <a target="_blank" href="{{ worksheet.providedby.url }}">{{ worksheet.providedby.name }}</a></div>
+            <div class="tags" ng-hide="worksheet.providedby"><span class="heading">标签：</span> {{ worksheet.tags.join(', ') }}</div>
+            <div class="tags" ng-if="worksheet.providedby"><span class="heading">提供者：</span> <a target="_blank" href="{{ worksheet.providedby.url }}">{{ worksheet.providedby.name }}</a></div>
             <div class="download">
                 <a ng-click="vm.downloadWorksheet($event, worksheet)" class="btn btn-primary">
                     <span class="glyphicon glyphicon-download-alt"> </span> {{ 'WORKSHEETS.DOWNLOAD' | translate }}

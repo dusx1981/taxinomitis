@@ -37,7 +37,7 @@
                 errObj = {};
             }
             else {
-                // record the error
+                // 记录错误
                 loggerService.error(errObj);
                 if (status === 500 && Sentry && Sentry.captureException) {
                     Sentry.captureException({ error : errObj, errortype : typeof (errObj) });
@@ -46,7 +46,7 @@
 
             vm[type].push({
                 alertid : alertId++,
-                message : errObj.message || errObj.error || 'Unknown error',
+                message : errObj.message || errObj.error || '未知错误',
                 status : status
             });
         }
@@ -65,43 +65,42 @@
         var currentWebcamIdx = 0;
 
 
-        // check that they're authenticated before doing anything else
+        // 在执行任何其他操作之前检查是否已认证
         authService.getProfileDeferred()
             .then(function (profile) {
                 vm.profile = profile;
 
-                // get the project that we're going to be training
-                loggerService.debug('[ml4ktraining] getting project info');
+                // 获取我们要训练的项目
+                loggerService.debug('[ml4ktraining] 获取项目信息');
                 return projectsService.getProject($scope.projectId, $scope.userId, profile.tenant);
             })
             .then(function (project) {
-                loggerService.debug('[ml4ktraining] project', project);
+                loggerService.debug('[ml4ktraining] 项目', project);
                 $scope.project = project;
 
-                // if the user doesn't own the project (it's been shared with them by a teacher
-                //  using the "crowd-sourced" mode) then we need to hide some of the controls
+                // 如果用户不拥有该项目（由教师使用"众包"模式共享给他们）
+                //  那么我们需要隐藏一些控件
                 $scope.crowdSourced = project.isCrowdSourced &&
                                       (vm.profile.user_id !== project.userid);
 
-                // for non-text projects we need to fetch some more things...
+                // 对于非文本项目，我们需要获取更多内容...
 
                 if (project.type === 'numbers') {
-                    // for numbers projects we need the fields to populate the drop-downs for new values
-                    loggerService.debug('[ml4ktraining] getting project fields');
+                    // 对于数字项目，我们需要字段来填充新值的下拉菜单
+                    loggerService.debug('[ml4ktraining] 获取项目字段');
                     return projectsService.getFields($scope.project, $scope.userId, vm.profile.tenant)
                         .then(function (fields) {
                             $scope.project.fields = fields;
                             $scope.projectfieldnames = fields.map(function (field) {
                                 return field.name;
                             });
-                            loggerService.debug('[ml4ktraining] field names', $scope.projectfieldnames);
+                            loggerService.debug('[ml4ktraining] 字段名称', $scope.projectfieldnames);
                         });
                 }
                 else if (project.type === 'sounds') {
-                    // for sounds projects we need to download the TensorFlow.js libraries if we don't
-                    //  already have them in the page
-                    loggerService.debug('[ml4ktraining] setting up sound model support');
-                    var loadSavedModel = false; // only using sound support to collect training examples
+                    // 对于声音项目，如果页面中尚未加载 TensorFlow.js 库，我们需要下载它们
+                    loggerService.debug('[ml4ktraining] 设置声音模型支持');
+                    var loadSavedModel = false; // 仅使用声音支持来收集训练示例
                     return soundTrainingService.initSoundSupport(project.id, project.labels, loadSavedModel)
                         .then(function (outcome) {
                             $scope.soundModelInfo = soundTrainingService.getModelInfo();
@@ -111,24 +110,23 @@
                         });
                 }
                 else if (project.type === 'imgtfjs') {
-                    // for image projects, we need to inject the dependencies for the
-                    //  webcam and canvas controls
-                    loggerService.debug('[ml4ktraining] fetching image project dependencies');
+                    // 对于图像项目，我们需要为网络摄像头和画布控件注入依赖项
+                    loggerService.debug('[ml4ktraining] 获取图像项目依赖项');
                     return utilService.loadImageProjectSupport();
                 }
             })
             .then(function () {
-                // we should have everything we need to prepare the page header now
+                // 现在我们应该拥有准备页面标题所需的一切
                 refreshLabelsSummary();
 
-                // prepare the empty training buckets for the project
+                // 为项目准备空的训练数据桶
                 for (var labelIdx in $scope.project.labels) {
                     var label = $scope.project.labels[labelIdx];
                     $scope.training[label] = [];
                 }
 
-                // fetch the training data to populate the buckets with
-                loggerService.debug('[ml4ktraining] getting training data');
+                // 获取训练数据以填充数据桶
+                loggerService.debug('[ml4ktraining] 获取训练数据');
                 return trainingService.getTraining($scope.projectId, $scope.userId, vm.profile.tenant);
             })
             .then(function (training) {
@@ -146,51 +144,48 @@
                                 });
                             modelService.deleteModel($scope.project.type, $scope.project.id)
                                 .catch (function (err) {
-                                    loggerService.error('[ml4ktraining] failed to delete model', err);
+                                    loggerService.error('[ml4ktraining] 删除模型失败', err);
                                 });
                         }
                     }, true);
                 }
                 else {
-                    // all the training data items will be returned in one list
-                    //  so they need to be sorted into the different buckets now
+                    // 所有训练数据项将在一个列表中返回
+                    //  因此现在需要将它们分类到不同的数据桶中
                     for (var trainingitemIdx in training) {
                         var trainingitem = training[trainingitemIdx];
 
                         var label = trainingitem.label;
 
                         if (label in $scope.training === false) {
-                            // This shouldn't happen - it means that we got some training data
-                            //  for a label that isn't known to the project.
+                            // 这不应该发生 - 这意味着我们获得了一些训练数据
+                            //  但对应的标签项目未知
                             //
-                            // It means the page state is out of date (e.g. the label was created
-                            //  after the page was first loaded from another instance of the page)
-                            //  which is a super unlikely race condition, but we avoid the possible
-                            //  error by creating a new bucket with this new label
+                            // 这意味着页面状态已过时（例如，标签是在页面首次加载后
+                            //  从另一个页面实例创建的）这是一个极不可能的竞态条件，
+                            //  但我们通过使用这个新标签创建一个新数据桶来避免可能的错误
                             $scope.training[label] = [];
                         }
 
                         $scope.training[label].push(trainingitem);
 
-                        // if this is a text project...
-                        //          trainingitem has the complete data - nothing left to do
-                        // if this is a numbers project...
-                        //          trainingitem has the complete data - nothing left to do
-                        // if this is an images project...
-                        //          trainingitem has the URL for the image, but the browser will fetch it
-                        //              for us automatically when we put it in the img src attribute
-                        //              so nothing left to do in code here, but there will be another
-                        //              network request before the image appears in the UI
-                        // if this is a sounds project...
-                        //          trainingitem has the URL for the sound spectogram, but we need to
-                        //              explicitly fetch it now (the page will display a loading icon
-                        //              until we get it)
+                        // 如果这是文本项目...
+                        //          trainingitem 包含完整数据 - 无需其他操作
+                        // 如果这是数字项目...
+                        //          trainingitem 包含完整数据 - 无需其他操作
+                        // 如果这是图像项目...
+                        //          trainingitem 包含图像的 URL，但当我们将其放入 img src 属性时，
+                        //              浏览器会自动为我们获取它，因此此处代码无需其他操作，
+                        //              但在图像出现在 UI 之前会有另一个网络请求
+                        // 如果这是声音项目...
+                        //          trainingitem 包含声音频谱图的 URL，但我们需要
+                        //              显式获取它（页面将显示加载图标直到我们获取到它）
 
 
 
                         if ($scope.project.type === 'sounds') {
-                            // this will modify 'trainingitem' to add a 'audiodata' attribute
-                            //  (but not immediately as it'll need to make an XHR request to get it)
+                            // 这将修改 'trainingitem' 以添加 'audiodata' 属性
+                            //  （但不会立即执行，因为它需要进行 XHR 请求来获取）
                             trainingService.getSoundData(trainingitem);
                         }
                     }
@@ -199,7 +194,7 @@
                 $scope.loadingtraining = false;
             })
             .catch(function (err) {
-                loggerService.error('[ml4ktraining] error', err);
+                loggerService.error('[ml4ktraining] 错误', err);
                 displayAlert('errors', err.status, err.data ? err.data : err);
             });
 
@@ -213,17 +208,17 @@
                     }) :
                     $scope.project.labels;
 
-                summary = modelService.generateProjectSummary(labels, ' or ') || '';
+                summary = modelService.generateProjectSummary(labels, ' 或 ') || '';
             }
             else if ($scope.project.type === 'regression') {
                 var projectColumns = $scope.project.columns || [];
                 var columns = projectColumns
                     .filter(col => col.output)
                     .map(col => col.label);
-                summary = modelService.generateProjectSummary(columns, ' and ') || 'something';
+                summary = modelService.generateProjectSummary(columns, ' 和 ') || '某物';
                 var numInputs = projectColumns.length - columns.length;
                 if (numInputs) {
-                    $scope.columnsSummary = ' from ' + numInputs + ' input values';
+                    $scope.columnsSummary = ' 来自 ' + numInputs + ' 个输入值';
                 }
             }
             $scope.project.labelsSummary = summary;
@@ -285,17 +280,17 @@
                 function (resp) {
                     if ($scope.project.type === 'imgtfjs') {
                         try {
-                            // do this to encode any URL characters that might need it
+                            // 对可能需要编码的任何 URL 字符进行编码
                             resp = new URL(resp).toString();
                         }
                         catch (err) {
-                            loggerService.debug('[ml4ktraining] unable to escape URL characters, using raw string', err);
+                            loggerService.debug('[ml4ktraining] 无法转义 URL 字符，使用原始字符串', err);
                         }
                     }
                     vm.addConfirmedTrainingData(resp, label);
                 },
                 function() {
-                    // cancelled. do nothing
+                    // 已取消。不执行任何操作
                 }
             );
         };
@@ -354,13 +349,12 @@
                 };
             }
             else if ($scope.project.type === 'sounds') {
-                // convert the Float32Array we get from the dialog
-                //  into a regular old JavaScript array
-                // (could use Array.from(resp) but IE doesnt like it)
+                // 将从对话框获取的 Float32Array
+                //  转换为常规的 JavaScript 数组
+                // （可以使用 Array.from(resp) 但 IE 不支持）
                 data = Array.prototype.slice.call(resp);
 
-                // duplicates are super unlikely so we're not going to
-                //  waste time checking
+                // 重复项极不可能，因此我们不会浪费时间检查
 
                 placeholder = {
                     id : 'placeholder_' + (placeholderId++),
@@ -370,19 +364,19 @@
                     isPlaceholder : true
                 };
 
-                // IMPORTANT - we use a different API for uploading sound
+                // 重要 - 我们使用不同的 API 上传声音
                 storeTrainingDataFn = trainingService.uploadSound;
             }
 
             if (duplicate) {
                 return displayAlert('errors', 400, {
-                    message : 'That is already in your training data'
+                    message : '该数据已存在于您的训练数据中'
                 });
             }
 
             $scope.training[label].push(placeholder);
 
-            loggerService.debug('[ml4ktraining] storing training data');
+            loggerService.debug('[ml4ktraining] 存储训练数据');
             storeTrainingDataFn($scope.projectId, $scope.userId, vm.profile.tenant, $scope.project.type, $scope.project.storage, data, label)
                 .then(function (newitem) {
                     placeholder.isPlaceholder = false;
@@ -392,9 +386,8 @@
                     {
                         if (utilService.isGoogleFilesUrl(placeholder.imageurl)) {
                             displayAlert('warnings', 400, { message :
-                                'Google often removes access to images on ' +
-                                'googleusercontent.com and lh3.google.com, which might prevent ' +
-                                'you training a model with this image' });
+                                'Google 通常会移除对 googleusercontent.com 和 lh3.google.com 上图像的访问权限，' +
+                                '这可能会阻止您使用此图像训练模型' });
                         }
                     }
 
@@ -421,7 +414,7 @@
                 $scope.$apply();
             }
             catch (refreshErr) {
-                loggerService.debug('[ml4ktraining] unable to refresh', refreshErr);
+                loggerService.debug('[ml4ktraining] 无法刷新', refreshErr);
             }
         }
 
@@ -430,7 +423,7 @@
             return err &&
                    err.status === 404 &&
                    err.data &&
-                   err.data.error === 'Not found';
+                   err.data.error === '未找到';
         }
 
 
@@ -442,7 +435,7 @@
         vm.onImageError = function (image) {
             image.loadingFailed = true;
             // displayAlert('errors', 400, {
-            //     error : 'Image (' + image.imageurl + ') in the ' + image.label + ' bucket could not be loaded, and has been highlighted in red. You should delete it.'
+            //     error : '图像 (' + image.imageurl + ') 在 ' + image.label + ' 数据桶中无法加载，并已用红色高亮显示。您应该删除它。'
             // });
         };
 
@@ -466,7 +459,7 @@
             })
             .then(
                 function (newlabel) {
-                    loggerService.debug('[ml4ktraining] adding a new label', newlabel);
+                    loggerService.debug('[ml4ktraining] 添加新标签', newlabel);
                     projectsService.addLabelToProject($scope.project, $scope.userId, vm.profile.tenant, newlabel)
                         .then(function (labels) {
                             $scope.project.labels = labels;
@@ -491,7 +484,7 @@
                         });
                 },
                 function() {
-                    // cancelled. do nothing
+                    // 已取消。不执行任何操作
                 }
             );
         };
@@ -507,12 +500,12 @@
 
         vm.deleteLabel = function (ev, label, idx) {
             var confirm = $mdDialog.confirm()
-                .title('Are you sure?')
-                .textContent('Do you want to delete "' + label + '"? (This cannot be undone)')
-                .ariaLabel('Confirm')
+                .title('确定吗？')
+                .textContent('您确定要删除 "' + label + '" 吗？（此操作无法撤销）')
+                .ariaLabel('确认')
                 .targetEvent(ev)
-                .ok('Yes')
-                .cancel('No');
+                .ok('是')
+                .cancel('否');
 
             $mdDialog.show(confirm).then(
                 function() {
@@ -527,7 +520,7 @@
                         });
                 },
                 function() {
-                    // cancelled. do nothing
+                    // 已取消。不执行任何操作
                 }
             );
         };
@@ -564,7 +557,7 @@
                             webcams = devices;
                             $scope.channel.videoOptions = webcams[currentWebcamIdx];
                             $scope.multipleWebcams = webcams.length > 1;
-                            loggerService.debug('[ml4ktraining] webcam config', $scope.channel.videoOptions);
+                            loggerService.debug('[ml4ktraining] 网络摄像头配置', $scope.channel.videoOptions);
                         });
 
                     $scope.webcamCanvas = null;
@@ -590,12 +583,12 @@
                     };
 
                     function displayWebcamError(err) {
-                        loggerService.debug('[ml4ktraining] displaying webcam error', err);
+                        loggerService.debug('[ml4ktraining] 显示网络摄像头错误', err);
 
                         $scope.webcamerror = err;
                         if (err && err.message) {
                             if (err.name === 'NotAllowedError') {
-                                $scope.webcamerrordetail = 'Not allowed to use the web-cam';
+                                $scope.webcamerrordetail = '不允许使用网络摄像头';
                                 return;
                             }
                             else {
@@ -603,22 +596,22 @@
                             }
                         }
 
-                        loggerService.error('[ml4ktraining] unexpected webcam error', err);
+                        loggerService.error('[ml4ktraining] 意外的网络摄像头错误', err);
                     }
 
                     function changeWebcamDevice () {
-                        loggerService.debug('[ml4ktraining] changing webcam device');
+                        loggerService.debug('[ml4ktraining] 更改网络摄像头设备');
                         $scope.$applyAsync(() => {
                             $scope.webcamInitComplete = false;
                             $scope.channel.videoOptions = webcams[currentWebcamIdx];
                             $scope.$broadcast('STOP_WEBCAM');
                             $scope.$broadcast('START_WEBCAM');
-                            loggerService.debug('[ml4ktraining] new webcam', webcams[currentWebcamIdx]);
+                            loggerService.debug('[ml4ktraining] 新网络摄像头', webcams[currentWebcamIdx]);
                         });
                     }
 
                     $scope.switchWebcam = function () {
-                        loggerService.debug('[ml4ktraining] switching webcam');
+                        loggerService.debug('[ml4ktraining] 切换网络摄像头');
                         if (webcams.length > 0) {
                             currentWebcamIdx += 1;
                             if (currentWebcamIdx >= webcams.length) {
@@ -629,22 +622,22 @@
                     };
 
                     $scope.onWebcamError = function(err) {
-                        loggerService.warn('[ml4ktraining] webcam error', err);
+                        loggerService.warn('[ml4ktraining] 网络摄像头错误', err);
 
                         if (webcams) {
-                            // failed to use the webcam - we won't try this one again
+                            // 使用网络摄像头失败 - 我们将不再尝试此摄像头
                             webcams.splice(currentWebcamIdx, 1);
                             $scope.multipleWebcams = webcams.length > 1;
                             currentWebcamIdx = 0;
 
                             if (webcams.length > 0) {
-                                // there are other webcams we haven't tried yet
+                                // 还有其他网络摄像头尚未尝试
                                 return changeWebcamDevice();
                             }
                         }
 
-                        // there are no other webcams left to try
-                        //   so we'll display the error
+                        // 没有其他网络摄像头可供尝试
+                        //   因此我们将显示错误
                         $scope.webcamInitComplete = true;
 
                         try {
@@ -670,7 +663,7 @@
                     vm.addImageData(resp, label, true);
                 },
                 function() {
-                    // cancelled. do nothing
+                    // 已取消。不执行任何操作
                 }
             );
         };
@@ -709,7 +702,7 @@
                     vm.addImageData(resp, label, true);
                 },
                 function() {
-                    // cancelled. do nothing
+                    // 已取消。不执行任何操作
                 }
             );
         };
@@ -726,7 +719,7 @@
 
             $scope.training[label].push(placeholder);
 
-            loggerService.debug('[ml4ktraining] adding image data');
+            loggerService.debug('[ml4ktraining] 添加图像数据');
             trainingService.uploadImage($scope.project, $scope.userId, vm.profile.tenant, imagedata, label)
                 .then(function (newitem) {
                     placeholder.isPlaceholder = false;
@@ -818,14 +811,14 @@
                     vm.addConfirmedTrainingData(resp, label);
                 },
                 function() {
-                    // cancelled. do nothing
+                    // 已取消。不执行任何操作
                 }
             );
         };
 
 
         $scope.downloadTrainingData = function (ev, label) {
-            loggerService.debug('[ml4ktraining] downloading training data to file');
+            loggerService.debug('[ml4ktraining] 将训练数据下载到文件');
             if ($scope.project.type === 'text') {
                 downloadService.downloadFile(
                     $scope.training[label].map(i => i.textdata + '\n'),
@@ -864,7 +857,7 @@
         };
 
         $scope.uploadTrainingData = function (ev, elem) {
-            loggerService.debug('[ml4ktraining] uploading training data from file');
+            loggerService.debug('[ml4ktraining] 从文件上传训练数据');
             var files = ev.currentTarget.files;
             if (files && files.length > 0) {
                 var file = ev.currentTarget.files[0];
@@ -873,15 +866,15 @@
                         .then(function (results) {
                             if ($scope.project.columns && $scope.project.columns.length > 0) {
 
-                                // pre-existing columns - check they match
+                                // 预存在的列 - 检查它们是否匹配
                                 if (!angular.equals(results.meta.fields, $scope.project.columns.map(c => c.label)))
                                 {
-                                    throw new Error('The columns in the CSV file do not match the columns you have in this project');
+                                    throw new Error('CSV 文件中的列与您在此项目中的列不匹配');
                                 }
                             }
                             else {
 
-                                // no pre-existing columns - use columns from CSV
+                                // 没有预存在的列 - 使用 CSV 中的列
                                 $scope.project.columns = results.meta.fields.map(function (columnName) {
                                     const column = {
                                         label: columnName,
@@ -892,7 +885,7 @@
                                         column.type = typeof results.data[0][columnName];
                                     }
                                     else {
-                                        // TODO other types?
+                                        // TODO 其他类型？
                                         column.type = 'unknown';
                                     }
 
@@ -916,10 +909,10 @@
                     const label = elem.dataset.label;
                     csvService.parseFile(file)
                         .then(function (results) {
-                            // pre-existing fields - check they match
+                            // 预存在的字段 - 检查它们是否匹配
                             if (!angular.equals(results.meta.fields, $scope.project.fields.map(c => c.name)))
                             {
-                                throw new Error('The columns in the CSV file do not match the fields you have in this project');
+                                throw new Error('CSV 文件中的列与您在此项目中的字段不匹配');
                             }
                             return trainingService.bulkAddTrainingData($scope.project, { label, numbers : results.data });
                         })
@@ -986,7 +979,7 @@
             })
             .then(
                 function (newlabel) {
-                    loggerService.debug('[ml4ktraining] adding a new column', newlabel);
+                    loggerService.debug('[ml4ktraining] 添加新列', newlabel);
                     if (!$scope.project.columns) {
                         $scope.project.columns = [];
                     }
@@ -997,13 +990,13 @@
                     });
                 },
                 function() {
-                    // cancelled. do nothing
+                    // 已取消。不执行任何操作
                 }
             );
         };
 
         vm.deleteAllRegression = function (ev) {
-            // TODO ask for confirmation?
+            // TODO 请求确认？
             $scope.training = [];
             trainingService.clearTrainingData($scope.project);
         };
@@ -1036,13 +1029,13 @@
                     }, 0);
                 }
                 else {
-                    loggerService.error('[ml4ktraining] unable to scroll to new item', itemId);
+                    loggerService.error('[ml4ktraining] 无法滚动到新项目', itemId);
                 }
             });
         }
 
         $scope.$on("$destroy", function () {
-            loggerService.debug('[ml4ktraining] handling page change');
+            loggerService.debug('[ml4ktraining] 处理页面更改');
 
             if ($scope.project && $scope.project.type === 'sounds'){
                 soundTrainingService.reset();

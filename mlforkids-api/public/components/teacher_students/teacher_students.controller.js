@@ -36,7 +36,7 @@
             var newId = alertId++;
             vm[type].push({
                 alertid : newId,
-                message : errObj.message || errObj.error || 'Unknown error',
+                message : errObj.message || errObj.error || '未知错误',
                 status : status
             });
             return newId;
@@ -76,12 +76,11 @@
 
 
         // ---------------------------------------------------------------
-        // Generic wrapper for most of the page logic, to make sure the
-        //   global busy indicator is always set correctly
+        // 页面逻辑的通用包装器，确保全局忙碌指示器始终正确设置
         // ---------------------------------------------------------------
 
         function performPageOperation(opname, prechecks, opfunction, onsuccess, onfail, confirmation) {
-            loggerService.debug('[ml4kuser] starting ' + opname);
+            loggerService.debug('[ml4kuser] 开始 ' + opname);
 
             $scope.busy = true;
 
@@ -94,12 +93,12 @@
                 opfunction()
                     .then(onsuccess)
                     .then(function () {
-                        loggerService.debug('[ml4kuser] completed ' + opname);
+                        loggerService.debug('[ml4kuser] 完成 ' + opname);
 
                         $scope.busy = false;
                     })
                     .catch(function (err) {
-                        loggerService.error('[ml4kuser] failed to perform operation', opname, err);
+                        loggerService.error('[ml4kuser] 执行操作失败', opname, err);
 
                         onfail(err);
 
@@ -121,13 +120,13 @@
         }
 
         // ---------------------------------------------------------------
-        // ----- DATA/API FUNCTIONS --------------------------------------
+        // ----- 数据/API 函数 --------------------------------------------
         // ---------------------------------------------------------------
 
 
-        // Retrieving list of students to display in the page
+        // 检索要在页面中显示的学生列表
         function fetchAndDisplayStudents(profile, groupname) {
-            var operation = 'fetching students in group ' + groupname;
+            var operation = '获取组 ' + groupname + ' 中的学生';
             var opFunction = function () {
                 return usersService.getStudentList(profile, groupname);
             };
@@ -138,9 +137,9 @@
         }
 
 
-        // Retrieving the ungrouped students to display in the final list
+        // 检索未分组学生以在最终列表中显示
         $scope.fetchAndDisplayUngroupedStudents = function () {
-            var operation = 'fetching ungrouped students';
+            var operation = '获取未分组学生';
 
             var prechecks = function () {
                 $scope.ungroupedStudentsExpanded = !$scope.ungroupedStudentsExpanded;
@@ -159,9 +158,9 @@
         };
 
 
-        // Moving selected students from one group to another
+        // 将选定的学生从一个组移动到另一个组
         $scope.moveStudentsIntoGroup = function(fromgroup, togroup) {
-            var operation = 'moving students from ' + fromgroup + ' to ' + togroup;
+            var operation = '将学生从 ' + fromgroup + ' 移动到 ' + togroup;
 
             var prechecks = function () {
                 if (!selections[fromgroup]) {
@@ -208,9 +207,9 @@
         };
 
 
-        // Moving selected students from a group into the ungrouped list
+        // 将选定的学生从组中移动到未分组列表
         $scope.removeStudentsFromGroup = function(group) {
-            var operation = 'removing students from group ' + group;
+            var operation = '从组 ' + group + ' 中移除学生';
 
             var prechecks = function () {
                 if (!selections[group]) {
@@ -250,9 +249,9 @@
         };
 
 
-        // Delete selected students (display prompt first)
+        // 删除选定的学生（首先显示提示）
         vm.deleteUsers = function (ev, groupname) {
-            var operation = 'deleting selected students from ' + groupname;
+            var operation = '从 ' + groupname + ' 删除选定的学生';
 
             var prechecks = function () {
                 if (!vm.groupedStudents[groupname] || !selections[groupname]) {
@@ -275,11 +274,11 @@
 
                 vm.groupedStudents[groupname] = vm.groupedStudents[groupname].filter(function (student) {
                     if (deletedUserIds.indexOf(student.id) > -1) {
-                        // student was deleted
+                        // 学生已被删除
                         return false;
                     }
                     else {
-                        // student could not be deleted
+                        // 学生无法删除
                         student.isPlaceholder = false;
                         return true;
                     }
@@ -287,7 +286,7 @@
                 selections[groupname] = [];
 
                 if (studentsToDelete.length !== deletedUserIds.length) {
-                    var errId = displayAlert('warnings', 400, { message : 'Not all selected students could be deleted' });
+                    var errId = displayAlert('warnings', 400, { message : '无法删除所有选定的学生' });
                     scrollToNewItem('warnings' + errId);
                 }
             };
@@ -299,7 +298,7 @@
             };
 
             var confirmation = {
-                message : 'Do you want to delete these students and all of their work? (This cannot be undone)',
+                message : '您确定要删除这些学生及其所有工作吗？（此操作无法撤销）',
                 event : ev
             };
 
@@ -307,9 +306,9 @@
         };
 
 
-        // Delete single student (display prompt first)
+        // 删除单个学生（首先显示提示）
         vm.deleteUser = function (ev, groupname, student) {
-            var operation = 'deleting student ' + student.username + ' ' + student.id;
+            var operation = '删除学生 ' + student.username + ' ' + student.id;
 
             var prechecks = function () {
                 student.isPlaceholder = true;
@@ -338,7 +337,7 @@
             };
 
             var confirmation = {
-                message : 'Do you want to delete ' + student.username + ' and all of their work? (This cannot be undone)',
+                message : '您确定要删除 ' + student.username + ' 及其所有工作吗？（此操作无法撤销）',
                 event : ev
             };
 
@@ -346,9 +345,9 @@
         };
 
 
-        // Creating a new group of students
+        // 创建新的学生组
         $scope.createStudentGroup = function (ev) {
-            loggerService.debug('[ml4kuser] requesting details for creating student group');
+            loggerService.debug('[ml4kuser] 请求创建学生组的详细信息');
 
             $mdDialog.show({
                 controller : function ($scope, $mdDialog) {
@@ -368,7 +367,7 @@
             })
             .then(
                 function(groupname) {
-                    var operation = 'creating student group ' + groupname;
+                    var operation = '创建学生组 ' + groupname;
 
                     var prechecks = function () {
                         return groupname &&
@@ -392,9 +391,9 @@
         };
 
 
-        // Deleting a group of students (must be empty)
+        // 删除学生组（必须为空）
         $scope.deleteStudentGroup = function (ev, groupname) {
-            var operation = 'deleting student group ' + groupname;
+            var operation = '删除学生组 ' + groupname;
 
             var prechecks = function () {
                 return vm.groupedStudents[groupname] &&
@@ -416,9 +415,9 @@
         };
 
 
-        // reset password for single student
+        // 重置单个学生的密码
         vm.resetUserPassword = function (ev, student) {
-            var operation = 'resetting student password ' + student.id + ' ' + student.username;
+            var operation = '重置学生密码 ' + student.id + ' ' + student.username;
 
             var prechecks = function () {
                 student.isPlaceholder = true;
@@ -442,9 +441,9 @@
         };
 
 
-        // Resetting multiple student passwords
+        // 重置多个学生的密码
         vm.resetUsersPassword = function (ev, groupname) {
-            var operation = 'resetting passwords for selected students in ' + groupname;
+            var operation = '重置 ' + groupname + ' 中选定学生的密码';
 
             var prechecks = function () {
                 return vm.groupedStudents[groupname] && selections[groupname] && selections[groupname].length > 0;
@@ -462,7 +461,7 @@
                     student.isPlaceholder = false;
                 });
                 displayPassword(ev, {
-                    username : 'Selected students',
+                    username : '选定的学生',
                     password : resp.password
                 }, studentsToReset.length > 30);
             };
@@ -475,7 +474,7 @@
             };
 
             var confirmation = {
-                message : 'Do you want to reset the passwords for the selected students?',
+                message : '您确定要重置选定学生的密码吗？',
                 event : ev
             };
 
@@ -483,9 +482,9 @@
         };
 
 
-        // Creating single user
+        // 创建单个用户
         vm.createUser = function (ev, group) {
-            loggerService.debug('[ml4kuser] requesting details for creating individual student in group ' + group);
+            loggerService.debug('[ml4kuser] 请求在组 ' + group + ' 中创建单个学生的详细信息');
 
             if (!vm.groupedStudents[group] || vm.groupedStudents[group].length >= $scope.MAX_PER_GROUP) {
                 return;
@@ -509,7 +508,7 @@
             })
             .then(
                 function(username) {
-                    var operation = 'creating student ' + username;
+                    var operation = '创建学生 ' + username;
 
                     var newUserObj = {
                         id : placeholderId++,
@@ -542,9 +541,9 @@
         };
 
 
-        // Creating multiple users
+        // 创建多个用户
         vm.createMultipleUsers = function (ev, group) {
-            loggerService.debug('[ml4kuser] requesting details for creating multiple students');
+            loggerService.debug('[ml4kuser] 请求创建多个学生的详细信息');
 
             var userslimit = Math.min($scope.MAX_PER_GROUP, vm.policy.maxUsers);
             var remaining = userslimit - vm.groupedStudents[group].length;
@@ -574,7 +573,7 @@
                                 $scope.password = resp.password;
                             })
                             .catch(function (err) {
-                                loggerService.error('[ml4kuser] failed to generate password', err);
+                                loggerService.error('[ml4kuser] 生成密码失败', err);
                             });
                     };
 
@@ -586,7 +585,7 @@
             })
             .then(
                 function(dialogResp) {
-                    var operation = 'creating multiple students';
+                    var operation = '创建多个学生';
 
                     var prechecks = function () {
                         if (vm.groupedStudents[group] && dialogResp.number && dialogResp.number < $scope.MAX_PER_GROUP) {
@@ -636,7 +635,7 @@
         };
 
         vm.importMultipleUsers = function (ev, group) {
-            loggerService.debug('[ml4kuser] requesting details for importing students');
+            loggerService.debug('[ml4kuser] 请求导入学生的详细信息');
 
             var userslimit = Math.min($scope.MAX_PER_GROUP, vm.policy.maxUsers);
             var remaining = userslimit - vm.groupedStudents[group].length;
@@ -663,7 +662,7 @@
                                 $scope.password = resp.password;
                             })
                             .catch(function (err) {
-                                loggerService.error('[ml4kuser] failed to generate password', err);
+                                loggerService.error('[ml4kuser] 生成密码失败', err);
                             });
                     };
                     $scope.getUsers = function (ev) {
@@ -701,7 +700,7 @@
             })
             .then(
                 function(dialogResp) {
-                    var operation = 'importing students';
+                    var operation = '导入学生';
 
                     var prechecks = function () {
                         if (vm.groupedStudents[group]) {
@@ -752,12 +751,12 @@
 
 
         // ---------------------------------------------------------------
-        // ----- PAGE INTERACTIVITY FUNCTIONS ----------------------------
+        // ----- 页面交互功能 ---------------------------------------------
         // ---------------------------------------------------------------
 
 
         // ---------------------------------------------------------------
-        // Handling the collapsable lists of students
+        // 处理可折叠的学生列表
         // ---------------------------------------------------------------
 
         var expandedpanels = [];
@@ -781,7 +780,7 @@
         $scope.ungroupedStudentsExpanded = false;
 
         // ---------------------------------------------------------------
-        // Handling the selection checkboxes
+        // 处理选择复选框
         // ---------------------------------------------------------------
 
         var selections = {};
@@ -860,33 +859,33 @@
         }
 
         // ---------------------------------------------------------------
-        // Requesting user confirmation
+        // 请求用户确认
         // ---------------------------------------------------------------
 
-        // Display confirmation dialog before running function
+        // 在运行函数前显示确认对话框
         function requestConfirmationBeforeFunction (confirmationReq, ifConfirmed, ifCancelled) {
             var confirm = $mdDialog.confirm()
-                .title('Are you sure?')
+                .title('确定吗？')
                 .textContent(confirmationReq.message)
-                .ariaLabel('Confirm')
+                .ariaLabel('确认')
                 .targetEvent(confirmationReq.event)
-                .ok('Yes')
-                .cancel('No');
+                .ok('是')
+                .cancel('否');
 
             $mdDialog.show(confirm).then(ifConfirmed, ifCancelled);
         }
 
-        // Displaying a generated password
+        // 显示生成的密码
         function displayPassword(ev, student, showWarning) {
             $mdDialog.show(
                 $mdDialog.alert()
                     .clickOutsideToClose(true)
                     .title(student.username)
                     .htmlContent(
-                        '<div>Password: <span class="passworddisplaydialog">' + student.password + '</span></div>' +
-                        (showWarning ? '<div><strong>Note:</strong> This may take a few minutes to take effect. Please be patient.' : ''))
-                    .ariaLabel('Confirm student password')
-                    .ok('OK')
+                        '<div>密码: <span class="passworddisplaydialog">' + student.password + '</span></div>' +
+                        (showWarning ? '<div><strong>注意：</strong>这可能需要几分钟才能生效。请耐心等待。' : ''))
+                    .ariaLabel('确认学生密码')
+                    .ok('确定')
                     .targetEvent(ev)
                 );
         }
@@ -898,19 +897,18 @@
                 if (resp.failures.length > 0 || resp.duplicates.length > 0)
                 {
                     var title = resp.failures.length > 0 ?
-                                    'Something went wrong!' :
-                                    'Usernames already in use';
+                                    '出错了！' :
+                                    '用户名已被使用';
 
                     var message = '';
 
                     if (resp.failures.length > 0) {
-                        message = '<div>Sorry. An unexpected error happened when trying to create: <br/>' +
+                        message = '<div>抱歉。尝试创建以下用户时发生意外错误：<br/>' +
                                     '<code>' + resp.failures.join(', ') + '</code>' +
                                 '</div>';
                     }
                     if (resp.duplicates.length > 0) {
-                        message = '<div>The following student accounts could not be created because there are ' +
-                                    'already users with these usernames: <br/>' +
+                        message = '<div>以下学生账户无法创建，因为已存在具有这些用户名的用户：<br/>' +
                                     '<code>' + resp.duplicates.join(', ') + '</code>' +
                                 '</div>';
                     }
@@ -919,13 +917,13 @@
                 }
                 else if (resp.successes.length > 0) {
                     displayPassword(ev, {
-                        username : 'New students created:',
+                        username : '新学生已创建：',
                         password : password
                     }, false);
                 }
             }
             else {
-                var errId = displayAlert('errors', 500, { error : 'Unexpected response' });
+                var errId = displayAlert('errors', 500, { error : '意外的响应' });
                 scrollToNewItem('errors' + errId);
             }
         }
@@ -936,7 +934,7 @@
                     .clickOutsideToClose(true)
                     .title(title)
                     .htmlContent(contents)
-                    .ok('OK')
+                    .ok('确定')
                     .targetEvent(ev)
                 );
         }

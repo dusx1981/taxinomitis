@@ -33,7 +33,7 @@
             var newId = alertId++;
             vm[type].push({
                 alertid : newId,
-                message : errObj.message || errObj.error || 'Unknown error',
+                message : errObj.message || errObj.error || '未知错误',
                 status : status
             });
             return newId;
@@ -41,7 +41,7 @@
 
 
         function computeLimit(type) {
-            loggerService.debug('[ml4kapi] computing limit for ' + type);
+            loggerService.debug('[ml4kapi] 计算 ' + type + ' 的限制');
             var creds = vm.credentials[type];
 
             var mlmodels = 0;
@@ -65,10 +65,10 @@
         }
 
         function getCredentials(profile, type) {
-            loggerService.debug('[ml4kapi] retrieving IBM credentials (' + type + ')');
+            loggerService.debug('[ml4kapi] 检索 IBM 凭证 (' + type + ')');
             usersService.getCredentials(profile, type)
                 .then(function (creds) {
-                    loggerService.debug('[ml4kapi] got IBM credentials (' + type + ')');
+                    loggerService.debug('[ml4kapi] 获取到 IBM 凭证 (' + type + ')');
 
                     vm.credentials[type] = creds;
                     vm.credentials.loading[type] = false;
@@ -76,7 +76,7 @@
                     computeLimit(type);
                 })
                 .catch(function (err) {
-                    loggerService.error('[ml4kapi] failed to get credentials (' + type + ')', err);
+                    loggerService.error('[ml4kapi] 获取凭证失败 (' + type + ')', err);
 
                     vm.credentials.failed[type] = true;
                     vm.credentials.loading[type] = false;
@@ -127,17 +127,17 @@
 
 
         vm.verifyCredentials = function (ev, creds) {
-            loggerService.debug('[ml4kapi] verifying IBM credentials');
+            loggerService.debug('[ml4kapi] 验证 IBM 凭证');
             creds.verifying = true;
 
             usersService.verifyCredentials(vm.profile, creds)
                 .then(function () {
-                    loggerService.debug('[ml4kapi] verified');
+                    loggerService.debug('[ml4kapi] 验证成功');
                     creds.verified = true;
                     creds.verifying = false;
                 })
                 .catch(function (err) {
-                    loggerService.error('[ml4kapi] check failed', err);
+                    loggerService.error('[ml4kapi] 检查失败', err);
 
                     creds.verified = false;
                     creds.verifying = false;
@@ -148,32 +148,32 @@
                     }
 
                     var details = $mdDialog.alert()
-                            .title('IBM Watson rejected your API key')
+                            .title('IBM Watson 拒绝了您的 API 密钥')
                             .htmlContent('<div class="confirmdialogsmall">' +
-                                creds.apikey + ' was rejected by IBM. ' +
-                                (errMessage ? '<div>The response was : ' + errMessage + '</div>' : '') +
+                                creds.apikey + ' 被 IBM 拒绝。' +
+                                (errMessage ? '<div>响应为：' + errMessage + '</div>' : '') +
                                 '</div>')
-                            .ok('OK');
+                            .ok('确定');
                     $mdDialog.show(details);
                 });
         };
 
         vm.deleteCredentials = function (ev, creds, type) {
-            loggerService.debug('[ml4kapi] deleting IBM credentials');
+            loggerService.debug('[ml4kapi] 删除 IBM 凭证');
 
             var confirm = $mdDialog.confirm()
-                .title('Are you sure?')
-                .textContent('Do you want to remove these credentials from machinelearningforkids.co.uk?')
-                .ariaLabel('Confirm')
+                .title('您确定吗？')
+                .textContent('您确定要从 machinelearningforkids.co.uk 中移除这些凭证吗？')
+                .ariaLabel('确认')
                 .targetEvent(ev)
-                .ok('Yes')
-                .cancel('No');
+                .ok('是')
+                .cancel('否');
 
             $mdDialog.show(confirm).then(
                 function() {
                     usersService.deleteCredentials(vm.profile, creds)
                         .then(function () {
-                            loggerService.debug('[ml4kapi] deleted');
+                            loggerService.debug('[ml4kapi] 已删除');
 
                             vm.credentials[type] = vm.credentials[type].filter(function (itm) {
                                 return itm.id !== creds.id;
@@ -181,20 +181,20 @@
                             computeLimit(type);
                         })
                         .catch(function (err) {
-                            loggerService.error('[ml4kapi] failed to delete', err);
+                            loggerService.error('[ml4kapi] 删除失败', err);
 
                             displayAlert('errors', err.status, err.data);
                         });
 
                 },
                 function() {
-                    // cancelled. do nothing
+                    // 取消。不做任何操作
                 });
         };
 
 
         vm.addCredentials = function (ev, type) {
-            loggerService.debug('[ml4kapi] adding new IBM credentials');
+            loggerService.debug('[ml4kapi] 添加新的 IBM 凭证');
 
             $mdDialog.show({
                 controller : function ($scope, $mdDialog) {
@@ -225,11 +225,11 @@
 
                     vm.credentials[type].push(credentialsToAdd);
 
-                    loggerService.debug('[ml4kapi] storing IBM credentials');
+                    loggerService.debug('[ml4kapi] 存储 IBM 凭证');
 
                     usersService.addCredentials(credentialsToAdd, vm.profile.tenant)
                         .then(function (newcreds) {
-                            loggerService.debug('[ml4kapi] stored');
+                            loggerService.debug('[ml4kapi] 已存储');
 
                             vm.credentials[type] = vm.credentials[type].filter(function (c) {
                                 return c.uniq !== placeholder;
@@ -239,7 +239,7 @@
                             computeLimit(type);
                         })
                         .catch(function (err) {
-                            loggerService.error('[ml4kapi] failed to store', err);
+                            loggerService.error('[ml4kapi] 存储失败', err);
 
                             var errId = displayAlert('errors', err.status, err.data);
                             scrollToNewItem('errors' + errId);
@@ -250,13 +250,13 @@
                         });
                 },
                 function() {
-                    // cancelled. do nothing
+                    // 取消。不做任何操作
                 }
             );
         };
 
         vm.modifyCredentials = function (ev, creds, type) {
-            loggerService.debug('[ml4kapi] modifying IBM credentials');
+            loggerService.debug('[ml4kapi] 修改 IBM 凭证');
 
             $mdDialog.show({
                 controller : function ($scope, $mdDialog) {
@@ -279,24 +279,24 @@
             })
             .then(
                 function(modifyRequest) {
-                    loggerService.debug('[ml4kapi] updating IBM credentials');
+                    loggerService.debug('[ml4kapi] 更新 IBM 凭证');
 
                     usersService.modifyCredentials(creds, type, modifyRequest.credstype, vm.profile.tenant)
                         .then(function () {
-                            loggerService.debug('[ml4kapi] updated');
+                            loggerService.debug('[ml4kapi] 已更新');
 
                             creds.credstype = modifyRequest.credstype;
                             computeLimit(type);
                         })
                         .catch(function (err) {
-                            loggerService.error('[ml4kapi] failed to update', err);
+                            loggerService.error('[ml4kapi] 更新失败', err);
 
                             var errId = displayAlert('errors', err.status, err.data);
                             scrollToNewItem('errors' + errId);
                         });
                 },
                 function() {
-                    // cancelled. do nothing
+                    // 取消。不做任何操作
                 }
             );
         };
@@ -304,13 +304,11 @@
 
         vm.explainLimit = function () {
             var alert = $mdDialog.alert()
-                            .title('Limit on the number of machine learning models')
-                            .textContent('When a student in your class clicks on the "Train machine learning model" ' +
-                                         'button, the model that they create will count towards this limit. If this limit ' +
-                                         'is exceeded, they will see an error saying that the class has already created ' +
-                                         'their maximum allowed number of models. See the "Help" page for suggestions for ' +
-                                         'how to avoid this')
-                            .ok('OK');
+                            .title('机器学习模型数量限制说明')
+                            .textContent('当您班级中的学生点击"训练机器学习模型"按钮时，他们创建的模型将计入此限制。' +
+                                         '如果超出此限制，他们将看到一个错误，提示班级已达到允许创建的最大模型数量。' +
+                                         '有关如何避免此问题的建议，请参阅"帮助"页面')
+                            .ok('确定');
             $mdDialog.show(alert);
         };
 

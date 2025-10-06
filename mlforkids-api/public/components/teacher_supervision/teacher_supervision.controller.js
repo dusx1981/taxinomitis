@@ -30,7 +30,7 @@
             var newId = alertId++;
             vm[type].push({
                 alertid : newId,
-                message : errObj.message || errObj.error || 'Unknown error',
+                message : errObj.message || errObj.error || '未知错误',
                 status : status
             });
             return newId;
@@ -42,11 +42,11 @@
 
 
         function refreshProjectsList(profile) {
-            loggerService.debug('[ml4ksupervise] refreshing projects list');
+            loggerService.debug('[ml4ksupervise] 正在刷新项目列表');
 
             projectsService.getClassProjects(profile)
                 .then(function (projects) {
-                    loggerService.debug('[ml4ksupervise] got projects list');
+                    loggerService.debug('[ml4ksupervise] 已获取项目列表');
 
                     vm.projects = projects;
 
@@ -60,17 +60,17 @@
                                     summary = project.labels[0];
                                     break;
                                 case 2:
-                                    summary = project.labels[0] + ' or ' + project.labels[1];
+                                    summary = project.labels[0] + ' 或 ' + project.labels[1];
                                     break;
                                 case 3:
-                                    summary = project.labels[0] + ', ' +
-                                              project.labels[1] + ' or ' +
+                                    summary = project.labels[0] + '、' +
+                                              project.labels[1] + ' 或 ' +
                                               project.labels[2];
                                     break;
                                 default:
-                                    summary = project.labels[0] + ', ' +
-                                              project.labels[1] + ' or ' +
-                                              (project.labels.length - 2) + ' other classes';
+                                    summary = project.labels[0] + '、' +
+                                              project.labels[1] + ' 或 ' +
+                                              (project.labels.length - 2) + ' 其他类别';
                                     break;
                             }
                             project.labelsSummary = summary;
@@ -78,7 +78,7 @@
                     }
                 })
                 .catch(function (err) {
-                    loggerService.error('[ml4ksupervise] failed to get projects list', err);
+                    loggerService.error('[ml4ksupervise] 获取项目列表失败', err);
 
                     displayAlert('errors', err.status, err.data);
                 });
@@ -87,16 +87,16 @@
 
 
         function refreshClassifiersList(profile) {
-            loggerService.debug('[ml4ksupervise] refreshing classifiers list');
+            loggerService.debug('[ml4ksupervise] 正在刷新分类器列表');
 
             trainingService.getUnmanagedClassifiers(profile.tenant)
                 .then(function (classifiers) {
-                    loggerService.debug('[ml4ksupervise] got classifiers list');
+                    loggerService.debug('[ml4ksupervise] 已获取分类器列表');
 
                     vm.classifiers = classifiers;
                 })
                 .catch(function (err) {
-                    loggerService.debug('[ml4ksupervise] failed to get classifiers list');
+                    loggerService.debug('[ml4ksupervise] 获取分类器列表失败');
 
                     if (err && err.status && err.status === 403) {
                         // probably a managed tenant - so they're not allowed
@@ -128,59 +128,59 @@
 
 
         vm.deleteModel = function (ev, project) {
-            loggerService.debug('[ml4ksupervise] deleting model');
+            loggerService.debug('[ml4ksupervise] 正在删除模型');
 
             var confirm = $mdDialog.confirm()
-                .title('Are you sure?')
-                .textContent('Do you want to delete ' +
-                             (project.owner ? project.owner.username + '\'s ' : '') +
-                             'machine learning model from project ' + project.name + '?')
-                .ariaLabel('Confirm')
+                .title('确定吗？')
+                .textContent('您确定要删除项目 ' + project.name + ' 中' +
+                             (project.owner ? project.owner.username + ' 的 ' : '') +
+                             '机器学习模型吗？')
+                .ariaLabel('确认')
                 .targetEvent(ev)
-                .ok('Yes')
-                .cancel('No');
+                .ok('是')
+                .cancel('否');
 
             $mdDialog.show(confirm).then(
                 function() {
-                    loggerService.debug('[ml4ksupervise] submitting model deletion request');
+                    loggerService.debug('[ml4ksupervise] 正在提交模型删除请求');
 
                     project.hasModel = false;
                     trainingService.deleteModel(project, project.userid, project.classid, project.classifierId)
                         .then(function () {
-                            loggerService.debug('[ml4ksupervise] model deletion successful');
+                            loggerService.debug('[ml4ksupervise] 模型删除成功');
                         })
                         .catch(function (err) {
-                            loggerService.error('[ml4ksupervise] failed to delete model', err);
+                            loggerService.error('[ml4ksupervise] 删除模型失败', err);
 
                             displayAlert('errors', err.status, err.data);
                         });
                 },
                 function() {
-                    // cancelled. do nothing
+                    // 已取消。不执行任何操作
                 }
             );
         };
 
         vm.deleteClassifier = function (ev, classifier) {
-            loggerService.debug('[ml4ksupervise] deleting classifier');
+            loggerService.debug('[ml4ksupervise] 正在删除分类器');
 
             $scope.submittingDeleteRequest = true;
 
             var confirm = $mdDialog.confirm()
-                .title('Are you sure?')
-                .textContent('Do you want to delete ' + classifier.name + '?')
-                .ariaLabel('Confirm')
+                .title('确定吗？')
+                .textContent('您确定要删除 ' + classifier.name + ' 吗？')
+                .ariaLabel('确认')
                 .targetEvent(ev)
-                .ok('Yes')
-                .cancel('No');
+                .ok('是')
+                .cancel('否');
 
             $mdDialog.show(confirm).then(
                 function() {
-                    loggerService.debug('[ml4ksupervise] submitting classifier deletion request');
+                    loggerService.debug('[ml4ksupervise] 正在提交分类器删除请求');
 
                     trainingService.deleteBluemixClassifier(vm.profile.tenant, classifier.id, classifier.credentials.id, classifier.type)
                         .then(function () {
-                            loggerService.debug('[ml4ksupervise] classifier deletion successful');
+                            loggerService.debug('[ml4ksupervise] 分类器删除成功');
 
                             $scope.submittingDeleteRequest = false;
                             vm.classifiers[classifier.type] = vm.classifiers[classifier.type].filter(function (c) {
@@ -188,14 +188,14 @@
                             });
                         })
                         .catch(function (err) {
-                            loggerService.error('[ml4ksupervise] failed to delete classifier', err);
+                            loggerService.error('[ml4ksupervise] 删除分类器失败', err);
 
                             $scope.submittingDeleteRequest = false;
                             displayAlert('errors', err.status, err.data);
                         });
                 },
                 function() {
-                    // cancelled. do nothing
+                    // 已取消。不执行任何操作
                 }
             );
         };

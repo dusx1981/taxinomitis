@@ -39,7 +39,7 @@ export function init(): Promise<void> {
             pool : true,
         };
         const mailDefaults = {
-            from : 'Machine Learning for Kids <' + process.env[env.SMTP_USER] + '>',
+            from : '儿童机器学习 <' + process.env[env.SMTP_USER] + '>',
             replyTo : process.env[env.SMTP_REPLY_TO],
         };
 
@@ -49,14 +49,14 @@ export function init(): Promise<void> {
             .then(() => {
                 transporter = verifyTransporter;
 
-                log.info('Email credentials verified');
+                log.info('电子邮件凭据已验证');
             })
             .catch((err) => {
-                log.error({ err }, 'Failed to verify email credentials. Email sending disabled.');
+                log.error({ err }, '验证电子邮件凭据失败。电子邮件发送功能已禁用。');
             });
     }
     else {
-        log.info('Missing required fields for sending email. Email sending disabled.');
+        log.info('缺少发送电子邮件所需的字段。电子邮件发送功能已禁用。');
         return Promise.resolve();
     }
 }
@@ -85,7 +85,7 @@ export interface DeletedClass {
 const EMAILS: { [key: string]: EmailTemplate } = {
     deletedclass : {
         root : './resources/email-deleted-class.',
-        subject : 'Goodbye',
+        subject : '再见',
     },
 };
 
@@ -97,7 +97,7 @@ async function sendEmailToUser(
     copyAdmin: boolean): Promise<void>
 {
     if (!transporter) {
-        log.error('Skipping sending email as sender not initialized');
+        log.error('由于发送器未初始化，跳过发送电子邮件');
         return;
     }
 
@@ -113,7 +113,7 @@ async function sendEmailToUser(
         html : Mustache.render(templateHtml, values),
     };
 
-    log.info({ tenant, email : teacher.email, subject : templateinfo.subject }, 'Sending email');
+    log.info({ tenant, email : teacher.email, subject : templateinfo.subject }, '正在发送电子邮件');
 
     return transporter.sendMail(email);
 }

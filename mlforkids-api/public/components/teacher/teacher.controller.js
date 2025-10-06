@@ -29,7 +29,7 @@
             var newId = alertId++;
             vm[type].push({
                 alertid : newId,
-                message : errObj.message || errObj.error || 'Unknown error',
+                message : errObj.message || errObj.error || '未知错误',
                 status : status
             });
             return newId;
@@ -68,13 +68,13 @@
 
         vm.deleteClass = function (ev) {
             var confirm = $mdDialog.confirm()
-                            .title('Are you sure?')
-                            .htmlContent('<div class="confirmdialogsmall">This cannot be undone. ' +
-                                'It will delete your account, as well as the accounts of all of your students. ' +
-                                'I will not be able to retrieve any projects from your class if you do this.</div>')
+                            .title('您确定吗？')
+                            .htmlContent('<div class="confirmdialogsmall">此操作无法撤销。' +
+                                '这将删除您的账户，以及您所有学生的账户。' +
+                                '如果您执行此操作，我将无法恢复您班级中的任何项目。</div>')
                             .targetEvent(ev)
-                            .ok('Yes. Delete everything.')
-                            .cancel('No');
+                            .ok('是的，删除所有内容。')
+                            .cancel('取消');
             $mdDialog.show(confirm)
                 .then(
                     function () {
@@ -88,7 +88,7 @@
                                 displayAlert('errors', err.status, err);
                             });
                     },
-                    function () { /* cancelled */ }
+                    function () { /* 已取消 */ }
                 );
         }
     }

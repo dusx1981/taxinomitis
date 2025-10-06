@@ -17,7 +17,7 @@
             class="alert alert-danger alert-dismissible pageheadermsg" role="alert"
             ng-click="vm.dismissAlert('errors', $index)"
             id="errors{{error.alertid}}">
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <button type="button" class="close" data-dismiss="alert" aria-label="关闭"><span aria-hidden="true">&times;</span></button>
         <strong translate="APP.ERROR"></strong> {{ error.message }}<br/>
         <em ng-if="error.status >= 500"><span translate="ERRORS.IFPERSISTENT"></span> <a ui-sref="help" translate="ERRORS.LETMEKNOW"></a></em>
     </div>
@@ -25,7 +25,7 @@
             class="alert alert-warning alert-dismissible pageheadermsg" role="alert"
             ng-click="vm.dismissAlert('warnings', $index)"
             id="warnings{{warning.alertid}}">
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <button type="button" class="close" data-dismiss="alert" aria-label="关闭"><span aria-hidden="true">&times;</span></button>
         <strong translate="APP.WARNING"></strong> {{ warning.message }}
     </div>
 
@@ -33,41 +33,34 @@
     <div ng-if="vm && vm.classifiers && vm.classifiers.conv.length > 0" class="unmanagedClassifiers">
         <div class="warningHeading" translate>APP.WARNING</div>
         <div class="warningExplanation">
-            A check of the Watson API keys that you provided has found
-            <span ng-if="vm.classifiers.conv.length === 1">a </span>
-            machine learning model<span ng-if="vm.classifiers.conv.length > 1">s </span>
-            that isn't known to Machine Learning for Kids.
+            对您提供的 Watson API 密钥进行检查时发现
+            <span ng-if="vm.classifiers.conv.length === 1">一个 </span>
+            机器学习模型<span ng-if="vm.classifiers.conv.length > 1"> </span>
+            不被儿童机器学习所知。
         </div>
-        <div class="warningSubHeading">How could this happen?</div>
+        <div class="warningSubHeading">这可能是怎么发生的？</div>
         <div class="warningExplanation">
-            <strong>Reason 1: </strong>
-            You're using your Watson API keys for other things as well as
-            Machine Learning for Kids.
-        </div>
-        <div class="warningExplanation">
-            That's fine - you can ignore this. Just be aware that these
-            count towards the limits that IBM Cloud enforces for your
-            Watson credentials, so these mean that fewer models can be
-            created by your students.
+            <strong>原因1：</strong>
+            您将 Watson API 密钥同时用于儿童机器学习和其他用途。
         </div>
         <div class="warningExplanation">
-            <strong>Reason 2: </strong>
-            Something went wrong when the machine learning model was being
-            deleted, and it was left behind accidentally.
+            这没问题 - 您可以忽略此提示。但请注意，这些模型会计入 IBM Cloud 对您的 Watson 凭证实施的限制，因此这意味着您的学生可以创建的模型数量会减少。
         </div>
         <div class="warningExplanation">
-            You should delete the model, as it counts towards the limits
-            that IBM Cloud enforces for your credentials, and so will
-            mean fewer models that your students can create.
+            <strong>原因2：</strong>
+            在删除机器学习模型时出现了问题，导致它被意外遗留。
+        </div>
+        <div class="warningExplanation">
+            您应该删除此模型，因为它会计入 IBM Cloud 对您的凭证实施的限制，从而减少您的学生可以创建的模型数量。
         </div>
 
         <table style="width: 100%;" class="unmanagedClassifiersTable">
             <tr ng-repeat="classifier in vm.classifiers.conv">
                 <td><img class="mediumwatsonicon" hspace=10
                         src="static/images/conversation.jpg"
-                        alt="Model using a Watson Assistant API key"></td>
-                <td><strong>watsonx Assistant</strong> workspace
-                        (<small>{{ classifier.id }}</small>) called
+                        alt="使用 Watson Assistant API 密钥的模型"></td>
+                <td><strong>watsonx Assistant</strong> 工作空间
+                        (<small>{{ classifier.id }}</small>) 名为
                         <strong>"{{ classifier.name }}"</strong></td>
                 <td><button class="btn btn-danger"
                             style="margin-left: 1em"
@@ -93,24 +86,24 @@
         </div>
         <table class="studentslist wide" ng-if="vm.projects.length > 0">
             <tr>
-                <th title="Name of the project">
+                <th title="项目名称">
                     {{ 'TEACHER.SUPERVISION.NAME' | translate }}
                     <span class="glyphicon glyphicon-triangle-top" ng-click="vm.orderBy = 'name'"></span>
                     <span class="glyphicon glyphicon-triangle-bottom" ng-click="vm.orderBy = '-name'"></span>
                 </th>
-                <th title="Type of project - what the computer is being trained to recognise">
+                <th title="项目类型 - 计算机被训练识别的内容">
                     {{ 'TEACHER.SUPERVISION.TYPE' | translate }}
                     <span class="glyphicon glyphicon-triangle-top" ng-click="vm.orderBy = 'type'"></span>
                     <span class="glyphicon glyphicon-triangle-bottom" ng-click="vm.orderBy = '-type'"></span>
                 </th>
                 <th>
                 </th>
-                <th title="Owner of the project">
+                <th title="项目所有者">
                     {{ 'TEACHER.SUPERVISION.STUDENT' | translate }}
                     <span class="glyphicon glyphicon-triangle-top" ng-click="vm.orderBy = 'owner.username'"></span>
                     <span class="glyphicon glyphicon-triangle-bottom" ng-click="vm.orderBy = '-owner.username'"></span>
                 </th>
-                <th title="Whether the project currently has a trained model using a Watson API key">
+                <th title="项目当前是否具有使用 Watson API 密钥训练的模型">
                     {{ 'TEACHER.SUPERVISION.MODELS' | translate }}
                     <span class="glyphicon glyphicon-triangle-top" ng-click="vm.orderBy = ['-hasModel', 'type']"></span>
                     <br/>
@@ -118,30 +111,30 @@
                 </th>
             </tr>
             <tr ng-repeat="project in vm.projects | orderBy : vm.orderBy" ng-class-even="'even'" ng-class-odd="'odd'">
-                <!-- Project name -->
+                <!-- 项目名称 -->
                 <td class="projectslistname" ng-hide="project.owner">{{ project.name }}</td>
                 <td class="projectslistname" ng-if="project.owner">
                     <a style="cursor: pointer" ui-sref="teacher_review_training({ projectId : project.id, userId : project.owner.id })">
                         {{ project.name }}
                     </a>
                 </td>
-                <!-- Project type  (text/images/numbers) -->
+                <!-- 项目类型 (文本/图片/数字) -->
                 <td class="studentslistdetail projecttype">
                     {{ project.type === 'imgtfjs' ? 'images' : project.type }}
                 </td>
-                <!-- Classes / Labels -->
+                <!-- 类别 / 标签 -->
                 <td class="studentslistdetail detail"> {{ project.labelsSummary }} </td>
-                <!-- Who owns the project -->
+                <!-- 项目所有者 -->
                 <td class="studentslistdetail detail" ng-hide="project.owner || project.isCrowdSourced"> </td>
                 <td class="studentslistdetail detail" ng-if="project.owner"> {{ project.owner.username }} </td>
-                <td class="studentslistdetail" ng-if="project.isCrowdSourced"><div class="mlprojectcrowd miniwatsonicon" title="'Whole class project' - available to all students in the class" > </div> </td>
-                <!-- If it has a trained model -->
+                <td class="studentslistdetail" ng-if="project.isCrowdSourced"><div class="mlprojectcrowd miniwatsonicon" title="'全班项目' - 对班级所有学生可用" > </div> </td>
+                <!-- 是否有训练好的模型 -->
                 <td class="studentslistdetail detail" ng-hide="project.hasModel"> </td>
                 <td class="studentslistdetail detail" ng-if="project.hasModel && project.type === 'text'">
                     <img class="miniwatsonicon" style="cursor: pointer"
                             src="static/images/conversation.jpg"
                             ng-click="vm.deleteModel($event, project)"
-                            alt="Model using a Watson Assistant API key">
+                            alt="使用 Watson Assistant API 密钥的模型">
                 </td>
             </tr>
         </table>
